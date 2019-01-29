@@ -28,6 +28,8 @@ class Home extends Component {
         const { playing, error, list } = this.props;
         return (
             <div>
+                {process.env.API_URL}
+                <br/>
                 {error}
                 <br />
                 <input
