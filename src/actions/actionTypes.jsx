@@ -1,0 +1,12 @@
+export const ActionType = {
+    PLAY: 'PLAY',
+    SEARCH_STARTED : 'SEARCH_STARTED',
+    SEARCH_SUCCESS : 'SEARCH_SUCCESS',
+    SEARCH_FAILURE : 'SEARCH_FAILURE',
+};
+
+export const AuthActionType = {   
+    LOGIN_STARTED : 'LOGIN_STARTED',
+    LOGIN_SUCCESS : 'LOGIN_SUCCESS',
+    LOGIN_FAILURE : 'LOGIN_FAILURE',
+};
