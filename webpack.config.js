@@ -5,12 +5,13 @@ const dotenv = require('dotenv');
 
 module.exports = () => {
     const env = dotenv.config().parsed;
+    if(!env)
+        env = {}
     // reduce it to a nice object, the same as before
-    if (env)
-        const envKeys = Object.keys(env).reduce((prev, next) => {
-            prev[`process.env.${next}`] = JSON.stringify(env[next]);
-            return prev;
-        }, {});
+    const envKeys = Object.keys(env).reduce((prev, next) => {
+        prev[`process.env.${next}`] = JSON.stringify(env[next]);
+        return prev;
+    }, {});
 
     return {
         entry: __dirname + "/src/index.jsx",
