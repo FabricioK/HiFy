@@ -1,5 +1,6 @@
 const HtmlWebPackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const merge = require('webpack-merge')
 const webpack = require('webpack');
 const dotenv = require('dotenv');
 
@@ -51,7 +52,12 @@ module.exports = env => {
             ]
         },
         plugins: [
-            new webpack.DefinePlugin(envKeys),
+            new webpack.DefinePlugin( merge(envKeys, {
+                auth_api: JSON.stringify(process.env.auth_api),
+                client_id: JSON.stringify(process.env.client_id),
+                redirect_uri: JSON.stringify(process.env.redirect_uri),
+                scopes: JSON.stringify(process.env.scopes),
+            })),
             new HtmlWebPackPlugin({
                 template: "./public/index.html",
                 filename: "./index.html"
