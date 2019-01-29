@@ -5,16 +5,25 @@ const webpack = require('webpack');
 const dotenv = require('dotenv');
 
 module.exports = env => {
-    let envKeys = {}
-    if (!env.production) {
-        const envAux = dotenv.config({ silent: true }).parsed;
+    let envKeysParsed = {}
 
+    if (!env.production) {
+        let envAux = dotenv.config().parsed;
         // reduce it to a nice object, the same as before
-        envKeys = Object.keys(envAux).reduce((prev, next) => {
+        envKeysParsed = Object.keys(envAux).reduce((prev, next) => {
             prev[`process.env.${next}`] = JSON.stringify(envAux[next]);
             return prev;
         }, {});
     }
+    let envKeys = merge(envKeysParsed, {
+        'process.env.auth_api': JSON.stringify(process.env.auth_api),
+        'process.env.client_id': JSON.stringify(process.env.client_id),
+        'process.env.redirect_uri': JSON.stringify(process.env.redirect_uri),
+        'process.env.scopes': JSON.stringify(process.env.scopes),
+    })
+
+    console.log(envKeys)
+
     return {
         entry: __dirname + "/src/index.jsx",
         output: {
@@ -52,12 +61,7 @@ module.exports = env => {
             ]
         },
         plugins: [
-            new webpack.DefinePlugin( merge(envKeys, {
-                auth_api: JSON.stringify(process.env.auth_api),
-                client_id: JSON.stringify(process.env.client_id),
-                redirect_uri: JSON.stringify(process.env.redirect_uri),
-                scopes: JSON.stringify(process.env.scopes),
-            })),
+            new webpack.DefinePlugin(envKeys),
             new HtmlWebPackPlugin({
                 template: "./public/index.html",
                 filename: "./index.html"
