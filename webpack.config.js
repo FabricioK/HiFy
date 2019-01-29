@@ -3,16 +3,17 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const webpack = require('webpack');
 const dotenv = require('dotenv');
 
-module.exports = () => {
-    const env = dotenv.config().parsed;
-    if(!env)
-        env = {}
-    // reduce it to a nice object, the same as before
-    const envKeys = Object.keys(env).reduce((prev, next) => {
-        prev[`process.env.${next}`] = JSON.stringify(env[next]);
-        return prev;
-    }, {});
+module.exports = env => {
+    let envKeys = {}
+    if (!env.production) {
+        const envAux = dotenv.config({ silent: true }).parsed;
 
+        // reduce it to a nice object, the same as before
+        envKeys = Object.keys(envAux).reduce((prev, next) => {
+            prev[`process.env.${next}`] = JSON.stringify(envAux[next]);
+            return prev;
+        }, {});
+    }
     return {
         entry: __dirname + "/src/index.jsx",
         output: {

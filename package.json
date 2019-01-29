@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
-    "heroku-postbuild": "webpack -p",
-    "dev": "webpack-dev-server --port 8085 --history-api-fallback --mode development --open",
+    "heroku-postbuild": "webpack -p --env.production",
+    "dev": "webpack-dev-server --env.development --port 8085 --history-api-fallback --mode development --open",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "FabricioK",
