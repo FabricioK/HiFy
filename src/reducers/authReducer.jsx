@@ -2,8 +2,8 @@ import { AuthActionType } from "../actions/actionTypes";
 
 const initialState = {
     auth_api: 'https://accounts.spotify.com/authorize',
-    client_id: '',
-    redirect_uri: 'http://localhost:8080',
+    client_id: '4146cf93d7244803a6b84093c4992a77',
+    redirect_uri: 'http://localhost:8085/callback',
     scopes : 'user-read-private user-read-email',
     token: null,
     logging: false,

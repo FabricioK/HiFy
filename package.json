@@ -4,14 +4,22 @@
   "description": "personal music dashboard",
   "main": "index.js",
   "scripts": {
-    "start": "webpack-dev-server --mode development --open",
+    "start": "node server.js",
+    "heroku-postbuild": "webpack -p",
+    "dev": "webpack-dev-server --port 8085 --history-api-fallback --mode development --open",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "FabricioK",
   "license": "ISC",
   "dependencies": {
+    "express": "^4.16.4",
+    "path": "^0.12.7",
     "react": "^16.7.0",
     "react-dom": "^16.5.0"
+  },
+  "engines": {
+    "node": "10.0.0",
+    "npm": "6.4.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0",

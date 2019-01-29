@@ -3,8 +3,6 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux';
 import { playButton, search, setToken } from '../actions'
 
-import qs from 'query-string'
-
 class Home extends Component {
     constructor(props) {
         super(props)
@@ -24,11 +22,6 @@ class Home extends Component {
         if (e.key === 'Enter') {
             this.props.search({ token: this.props.token, query: this.state.query, type: 'artist' })
         }
-    }
-    componentWillMount() {
-        const { access_token } = qs.parse(this.props.location.hash);
-        if (access_token)
-            this.props.setToken(access_token);
     }
 
     render() {
