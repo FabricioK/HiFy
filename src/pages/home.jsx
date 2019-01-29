@@ -28,8 +28,6 @@ class Home extends Component {
         const { playing, error, list } = this.props;
         return (
             <div>
-                {process.env.API_URL}
-                <br/>
                 {error}
                 <br />
                 <input
@@ -39,7 +37,7 @@ class Home extends Component {
                     onChange={this._updateQuery}
                 />
                 {!this.props.token ?
-                    <a href={`${this.props.auth_api}?response_type=token&client_id=${this.props.client_id}&scope=${encodeURIComponent(this.props.scopes)}&redirect_uri=${encodeURIComponent(this.props.redirect_uri)}`}>Login</a>
+                    <a href={`${process.env.auth_api}?response_type=token&client_id=${process.env.client_id}&scope=${encodeURIComponent(process.env.scopes)}&redirect_uri=${encodeURIComponent(process.env.redirect_uri)}`}>Login</a>
                     : <button onClick={this._play}>Search</button>
                 }
                 <ul>{list && list
@@ -65,12 +63,8 @@ class Home extends Component {
 const mapStateToProps = store => ({
     playing: store.playerState.playing,
     error: store.playerState.error,
-    list: store.playerState.list,
-    auth_api: store.authState.auth_api,
-    token: store.authState.token,
-    client_id: store.authState.client_id,
-    redirect_uri: store.authState.redirect_uri,
-    scopes: store.authState.scopes
+    list: store.playerState.list,   
+    token: store.authState.token
 });
 
 const mapDispatchToProps = dispatch =>
