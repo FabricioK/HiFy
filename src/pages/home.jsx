@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux';
 import { playButton, search, setToken } from '../actions'
+import Button from '@material-ui/core/Button';
+
 
 class Home extends Component {
     constructor(props) {
@@ -37,8 +39,10 @@ class Home extends Component {
                     onChange={this._updateQuery}
                 />
                 {!this.props.token ?
-                    <a href={`${process.env.auth_api}?response_type=token&client_id=${process.env.client_id}&scope=${encodeURIComponent(process.env.scopes)}&redirect_uri=${encodeURIComponent(process.env.redirect_uri)}`}>Login</a>
-                    : <button onClick={this._play}>Search</button>
+                    <a href={`${process.env.auth_api}?response_type=token&client_id=${process.env.client_id}&scope=${encodeURIComponent(process.env.scopes)}&redirect_uri=${encodeURIComponent(process.env.redirect_uri)}`}>
+                        <Button color="primary">Login</Button>
+                    </a>
+                    : <Button onClick={this._play} color="primary">Search</Button>
                 }
                 <ul>{list && list
                     .map((item, index) =>
@@ -51,10 +55,8 @@ class Home extends Component {
                                 item.images[0] ?
                                     <img src={item.images[0].url} width={200} /> : null
                             }
-
                         </li>
                     )}
-
                 </ul>
             </div>
         )
@@ -63,7 +65,7 @@ class Home extends Component {
 const mapStateToProps = store => ({
     playing: store.playerState.playing,
     error: store.playerState.error,
-    list: store.playerState.list,   
+    list: store.playerState.list,
     token: store.authState.token
 });
 
