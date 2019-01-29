@@ -12,12 +12,18 @@ class Home extends Component {
             query: ''
         }
     }
+    _play = () => {
+        this.props.search({ token: this.props.token, query: this.state.query, type: 'artist' })
+    }
 
-    updateQuery = (event) => {
+    _updateQuery = (event) => {
         this.setState({ query: event.target.value })
     }
-    play = () => {
-        this.props.search({ token: this.props.token, query: this.state.query, type: 'artist' })
+
+    _handleKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            this.props.search({ token: this.props.token, query: this.state.query, type: 'artist' })
+        }
     }
     componentWillMount() {
         const { access_token } = qs.parse(this.props.location.hash);
@@ -34,16 +40,17 @@ class Home extends Component {
                 <input
                     name="search"
                     type="text"
-                    onChange={this.updateQuery}
+                    onKeyUp={this._handleKeyPress}
+                    onChange={this._updateQuery}
                 />
                 {!this.props.token ?
                     <a href={`${this.props.auth_api}?response_type=token&client_id=${this.props.client_id}&scope=${encodeURIComponent(this.props.scopes)}&redirect_uri=${encodeURIComponent(this.props.redirect_uri)}`}>Login</a>
-                    : <button onClick={this.play}> Search</button>
+                    : <button onClick={this._play}>Search</button>
                 }
                 <ul>{list && list
                     .map((item, index) =>
                         <li key={index}>
-                            {item.name}
+                            {item.name} {item.popularity}
                             <br />
                             {item.genres.join(', ')}
                             <br />
