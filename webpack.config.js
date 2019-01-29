@@ -21,9 +21,7 @@ module.exports = env => {
         'process.env.redirect_uri': JSON.stringify(process.env.redirect_uri),
         'process.env.scopes': JSON.stringify(process.env.scopes),
     })
-
-    console.log(envKeys)
-
+    
     return {
         entry: __dirname + "/src/index.jsx",
         output: {
