@@ -85,22 +85,32 @@ class Home extends Component {
                             let pop = this._popularity(index, item.popularity);
                             return (
                                 <Grow
-                                    in={true}                                   
-                                    {...({ timeout: 1000 + (100 *index)  })}
+                                    in={true}
+                                    {...({ timeout: 1000 + (100 * index) })}
                                     key={index}
                                     cols={pop.cols || 1}
-                                    rows={pop.rows || 1}
-                                >
+                                    rows={pop.rows || 1}>
                                     <GridListTile
                                         onMouseEnter={() => this._hoverOn(item)}
                                         onMouseLeave={() => this._hoverOff(item)}
                                         className={item.hover == true ? classes.tileHover : classes.tile}>
-
                                         {item.images[0] ?
                                             <img
                                                 src={item.images[0].url}
                                                 alt={item.name}
                                             /> : null}
+                                        <GridListTileBar
+                                            title={item.name}
+                                            subtitle={item.genres.join(', ')}
+                                            titlePosition="top"
+                                            actionIcon={
+                                                <IconButton className={classes.icon}>
+                                                    <StarBorderIcon />
+                                                </IconButton>
+                                            }
+                                            actionPosition="left"
+                                            className={classes.titleBarTop}
+                                        />
                                         <GridListTileBar
                                             title={item.name}
                                             subtitle={item.genres.join(', ')}
@@ -112,7 +122,6 @@ class Home extends Component {
                                             actionPosition="left"
                                             className={classes.titleBar}
                                         />
-
                                     </GridListTile>
                                 </Grow>
                             )

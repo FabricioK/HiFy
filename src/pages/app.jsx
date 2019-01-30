@@ -10,6 +10,8 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
+import Typography from '@material-ui/core/Typography';
+import LinearProgress from '@material-ui/core/LinearProgress';
 
 import { search, loadUser } from '../actions'
 
@@ -70,7 +72,7 @@ class App extends Component {
         }
     }
     render() {
-        const { classes, error, token, user } = this.props;
+        const { classes, error, token, searching, user } = this.props;
         return (
             <div className={classes.root}>
                 <AppBar position="absolute">
@@ -79,23 +81,28 @@ class App extends Component {
                             <MenuIcon />
                         </IconButton>
                         {token ?
-                            <div className={classes.grow}>
-                                <input
-                                    name="search"
-                                    type="text"
-                                    className={classes.grow}
-                                    onKeyUp={this._handleKeyPress}
-                                    onChange={this._updateQuery}
-                                />
-                                <Button onClick={this._search} color="inherit">Search</Button>
-                                
-                            </div> :
-                            <a href={`${process.env.auth_api}?response_type=token&client_id=${process.env.client_id}&scope=${encodeURIComponent(process.env.scopes)}&redirect_uri=${encodeURIComponent(process.env.redirect_uri)}`}>
-                                <Button color="inherit">Login</Button>
-                            </a>
+                            <input
+                                name="search"
+                                type="text"
+                                className={classes.grow}
+                                onKeyUp={this._handleKeyPress}
+                                onChange={this._updateQuery}
+                            /> : <span className={classes.grow}/>}
+                        {token ?
+                            <Button onClick={this._search} color="inherit">Search</Button>
+                            :
+                            <Button 
+                                    href={`${process.env.auth_api}?response_type=token&client_id=${process.env.client_id}&scope=${encodeURIComponent(process.env.scopes)}&redirect_uri=${encodeURIComponent(process.env.redirect_uri)}`}
+                                    color="inherit">Login</Button>                                
+                           
 
                         } {error}
                     </Toolbar>
+                    <div className={classes.grow}>
+                        {searching ?
+                            <LinearProgress />
+                            : null}
+                    </div>
                 </AppBar>
                 <div className={classes.pages}>
                     <Route exact path="/" component={Home} />
@@ -109,9 +116,10 @@ class App extends Component {
 const mapStateToProps = store => ({
     playing: store.playerState.playing,
     error: store.playerState.error,
-    list: store.playerState.list,
+    list: store.playerState.list,    
+    searching : store.playerState.searching,
     token: store.authState.token,
-    user: store.authState.user,
+    user: store.authState.user
 });
 
 const mapDispatchToProps = dispatch =>
