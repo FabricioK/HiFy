@@ -42,6 +42,11 @@ export const setToken = token => ({
     payload: token
 });
 
+export const toogleHover = index => ({
+    type: ActionType.HOVER,
+    payload: index
+});
+
 export const playButton = value => ({
     type: ActionType.PLAY,
     payload: value

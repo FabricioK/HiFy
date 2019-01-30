@@ -1,4 +1,5 @@
 export const ActionType = {
+    HOVER: 'HOVER',
     PLAY: 'PLAY',
     SEARCH_STARTED : 'SEARCH_STARTED',
     SEARCH_SUCCESS : 'SEARCH_SUCCESS',

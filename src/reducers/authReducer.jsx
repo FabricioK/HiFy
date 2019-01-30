@@ -1,7 +1,7 @@
 import { AuthActionType } from "../actions/actionTypes";
 
-const initialState = {   
-    token: null,
+const initialState = {
+    token: localStorage.getItem('token'),
     logging: false,
     error: ''
 };
@@ -14,6 +14,7 @@ export const authReducer = (state = initialState, action) => {
                 token: null
             };
         case AuthActionType.LOGIN_SUCCESS:
+            localStorage.setItem('token', action.payload);
             return {
                 ...state,
                 logging: false,

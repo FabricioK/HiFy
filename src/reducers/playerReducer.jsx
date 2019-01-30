@@ -1,10 +1,11 @@
 import { ActionType } from "../actions/actionTypes";
+import orderBy from 'lodash/orderBy';
 
-const initialState = {   
+const initialState = {
     playing: false,
     searching: false,
     list: [],
-    error : ''
+    error: ''
 };
 export const playerReducer = (state = initialState, action) => {
     switch (action.type) {
@@ -18,21 +19,28 @@ export const playerReducer = (state = initialState, action) => {
             return {
                 ...state,
                 searching: true,
-                error :'',
+                error: '',
                 list: []
             };
         case ActionType.SEARCH_SUCCESS:
+            const payload = orderBy(action.payload, ['popularity', 'images'], ['desc'])
             return {
                 ...state,
                 searching: false,
-                list: action.payload
+                list: payload
             };
         case ActionType.SEARCH_FAILURE:
             return {
                 ...state,
                 searching: false,
-                error : action.payload
+                error: action.payload
             };
+        case ActionType.HOVER:
+            return {
+                ...state,
+                list: state.list.map(item =>
+                    item == action.payload ? { ...item, hover: !item.hover } : item)
+            }
         default:
             return state;
     }
