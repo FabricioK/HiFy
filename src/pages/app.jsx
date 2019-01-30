@@ -8,8 +8,12 @@ import Route from "react-router-dom/Route";
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Button from '@material-ui/core/Button';
+import Paper from '@material-ui/core/Paper';
+import InputBase from '@material-ui/core/InputBase';
 import IconButton from '@material-ui/core/IconButton';
+import Divider from '@material-ui/core/Divider';
 import MenuIcon from '@material-ui/icons/Menu';
+import SearchIcon from '@material-ui/icons/Search';
 import Typography from '@material-ui/core/Typography';
 import LinearProgress from '@material-ui/core/LinearProgress';
 
@@ -33,6 +37,16 @@ const styles = theme => ({
         minHeight: '100vh',
         height: '100%',
         width: '100%',
+    },
+    toolbar: {
+        flexDirection: 'row',
+        justifyContent: 'space-around'
+    },
+    searchBar: {
+        padding: '2px 4px',
+        display: 'flex',
+        alignItems: 'center',
+        width: '70vw'
     },
     grow: {
         flexGrow: 1,
@@ -59,7 +73,7 @@ class App extends Component {
     }
 
     _search = () => {
-        this.props.search({ token: this.props.token, query: this.state.query, type: 'artist', limit: 9, offset: 0 })
+        this.props.search({ token: this.props.token, query: this.state.query, type: 'artist', limit: 20, offset: 0 })
     }
 
     _updateQuery = (event) => {
@@ -68,7 +82,7 @@ class App extends Component {
 
     _handleKeyPress = (e) => {
         if (e.key === 'Enter') {
-            this.props.search({ token: this.props.token, query: this.state.query, type: 'artist', limit: 9, offset: 0 })
+            this.props.search({ token: this.props.token, query: this.state.query, type: 'artist', limit: 20, offset: 0 })
         }
     }
     render() {
@@ -76,20 +90,25 @@ class App extends Component {
         return (
             <div className={classes.root}>
                 <AppBar position="absolute">
-                    <Toolbar>
-                        <IconButton className={classes.menuButton} color="inherit" aria-label="Menu">
-                            <MenuIcon />
-                        </IconButton>
+                    <Toolbar className={classes.toolbar}>                        
                         {token ?
-                            <input
-                                name="search"
-                                type="text"
-                                className={classes.grow}
-                                onKeyUp={this._handleKeyPress}
-                                onChange={this._updateQuery}
-                            /> : <span className={classes.grow} />}
+                            <Paper className={classes.searchBar} elevation={1}>
+                                <InputBase
+                                    className={classes.input}
+                                    placeholder="Search ..."
+                                    name="search"
+                                    type="text"
+                                    className={classes.searchBar}
+                                    onKeyUp={this._handleKeyPress}
+                                    onChange={this._updateQuery}
+                                />
+                                <IconButton className={classes.iconButton} onClick={this._search} aria-label="Search">
+                                    <SearchIcon />
+                                </IconButton>
+                            </Paper>
+                            : <span className={classes.grow} />}
                         {token ?
-                            <Button onClick={this._search} color="inherit">Search</Button>
+                            null
                             :
                             <Button
                                 href={`${process.env.auth_api}?response_type=token&client_id=${process.env.client_id}&scope=${encodeURIComponent(process.env.scopes)}&redirect_uri=${encodeURIComponent(process.env.redirect_uri)}`}

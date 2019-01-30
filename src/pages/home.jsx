@@ -10,9 +10,11 @@ import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
 import GridListTileBar from '@material-ui/core/GridListTileBar';
 import ListSubheader from '@material-ui/core/ListSubheader';
-import IconButton from '@material-ui/core/IconButton';
-import StarBorderIcon from '@material-ui/icons/StarBorder';
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faPepperHot } from '@fortawesome/free-solid-svg-icons/faPepperHot'
+import { faUserNinja } from '@fortawesome/free-solid-svg-icons/faUserNinja'
+import { faHeart } from '@fortawesome/free-solid-svg-icons/faHeart'
+import { faSmile } from '@fortawesome/free-solid-svg-icons/faSmile'
 import Grow from '@material-ui/core/Grow';
 import Collapse from '@material-ui/core/Collapse';
 
@@ -20,10 +22,11 @@ const styles = theme => ({
     root: {
         backgroundColor: '#d6d6d6',
         width: '80vw',
-        marginTop: '30vh',
+        marginTop: '20vh',
         minHeight: '70vh',
         height: '100%',
         padding: theme.spacing.unit * 2,
+        borderRadius: '15px 15px 0 0'
     },
     image: {
         width: 128,
@@ -44,8 +47,10 @@ const styles = theme => ({
         background: 'none'
     },
     tile: {
+
     },
     tileHover: {
+        boxShadow: '5px 5px 1px grey',
         padding: '0px !important'
     },
     icon: {
@@ -78,21 +83,21 @@ class Home extends Component {
     _hoverOff = (e) => {
         this.props.toogleHover(e)
     }
-    _popularity(index, pop) {
-        if (index == 0)
-            return { cols: 2, rows: 2 };
-        if (pop >= 80)
-            return { cols: 1, rows: 1 };
+    _popularity(is_child, index, pop) {
+        let tag = { text: 'Hot', icon: <FontAwesomeIcon size="2x" icon={faPepperHot} /> };;
         if (pop >= 60 && pop <= 79)
-            return { cols: 1, rows: 1 };
+            tag = { text: 'Cool', icon: <FontAwesomeIcon size="lg" icon={faHeart} /> };
         if (pop >= 30 && pop <= 59)
-            return { cols: 1, rows: 1 };
+            tag = { text: 'Regular', icon: <FontAwesomeIcon size="lg" icon={faSmile} /> };
         if (pop <= 30)
-            return { cols: 1, rows: 1 };
+            tag = { text: 'Underground', icon: <FontAwesomeIcon size="lg" icon={faUserNinja} /> };
+
+        return (index == 0 && !is_child) ?
+            { cols: 2, rows: 2, tag } : { cols: 1, rows: 1, tag }
     }
 
     _GridItem = (classes, item, index, is_child) => {
-        let pop = is_child ? { cols: 1, rows: 1 } : this._popularity(index, item.popularity);
+        let pop = this._popularity(is_child, index, item.popularity);
         return <Grow
             in={true}
             {...({ timeout: 1000 + (100 * index) })}
@@ -114,8 +119,8 @@ class Home extends Component {
                     titlePosition="top"
                     title={
                         <Collapse in={item.hover == true} className={classes.nomargin}>
-                            <Paper  className={classes.nomargin}>
-                                <ListSubheader component="div">December</ListSubheader>
+                            <Paper className={classes.nomargin}>
+                                <ListSubheader component="div">{pop.tag.icon}</ListSubheader>
                             </Paper>
                         </Collapse>
                     }
