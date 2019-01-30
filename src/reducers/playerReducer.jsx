@@ -1,5 +1,7 @@
 import { ActionType } from "../actions/actionTypes";
 import orderBy from 'lodash/orderBy';
+import groupBy from 'lodash/groupBy';
+import without from 'lodash/without';
 
 const initialState = {
     playing: false,
@@ -24,10 +26,17 @@ export const playerReducer = (state = initialState, action) => {
             };
         case ActionType.SEARCH_SUCCESS:
             const payload = orderBy(action.payload, ['popularity', 'images'], ['desc'])
+            let index = 0;
+            const miniaba = groupBy(payload, () => {
+                index++;
+                return (index > 1 && index < 6)
+            })
+            miniaba.false.splice(1, 0, { childs: miniaba.true });
+            console.log(miniaba.false);
             return {
                 ...state,
                 searching: false,
-                list: payload
+                list: miniaba.false
             };
         case ActionType.SEARCH_FAILURE:
             return {
@@ -36,10 +45,19 @@ export const playerReducer = (state = initialState, action) => {
                 error: action.payload
             };
         case ActionType.HOVER:
+            const list = state.list.map(item => {
+                return (item.childs ?
+                    {
+                        childs: item.childs.map(child => {
+                            return child == action.payload ? { ...child, hover: !child.hover } : child
+                        })
+                    } :
+                    item == action.payload ? { ...item, hover: !item.hover } : item)
+            });
+            console.log(list);
             return {
                 ...state,
-                list: state.list.map(item =>
-                    item == action.payload ? { ...item, hover: !item.hover } : item)
+                list: list
             }
         default:
             return state;

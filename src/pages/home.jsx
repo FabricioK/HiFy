@@ -45,6 +45,9 @@ const styles = theme => ({
     },
     icon: {
         color: 'white',
+    },
+    nomargin: {
+        margin: '0px !important'
     }
 });
 
@@ -75,55 +78,77 @@ class Home extends Component {
             return { cols: 1, rows: 1 };
     }
 
+    _GridItem = (classes, item, index, is_child) => {
+
+        let pop = is_child ? { cols: 1, rows: 1 } : this._popularity(index, item.popularity);
+        return <Grow
+            in={true}
+            {...({ timeout: 1000 + (100 * index) })}
+            key={index}
+            cols={pop.cols || 1}
+            rows={pop.rows || 1}>
+            <GridListTile
+                onMouseEnter={() => this._hoverOn(item)}
+                onMouseLeave={() => this._hoverOff(item)}
+                className={item.hover == true ? classes.tileHover : classes.tile}>
+                {item.images[0] ?
+                    <img
+                        src={item.images[0].url}
+                        alt={item.name}
+                    /> : null}
+                <GridListTileBar
+                    title={item.name}
+                    subtitle={item.genres.join(', ')}
+                    titlePosition="top"
+                    actionIcon={
+                        <IconButton className={classes.icon}>
+                            <StarBorderIcon />
+                        </IconButton>
+                    }
+                    actionPosition="left"
+                    className={classes.titleBarTop}
+                />
+                <GridListTileBar
+                    title={item.name}
+                    subtitle={item.genres.join(', ')}
+                    actionIcon={
+                        <IconButton className={classes.icon}>
+                            <StarBorderIcon />
+                        </IconButton>
+                    }
+                    actionPosition="left"
+                    className={classes.titleBar}
+                />
+            </GridListTile>
+        </Grow>
+    }
+
     render() {
         const { classes, playing, list } = this.props;
         return (
             <Paper className={classes.root}>
-                <GridList spacing={30} cellHeight={160} cols={4}>
+                <GridList spacing={30} cellHeight={190} cols={4}>
                     {list && list
                         .map((item, index) => {
-                            let pop = this._popularity(index, item.popularity);
-                            return (
-                                <Grow
-                                    in={true}
-                                    {...({ timeout: 1000 + (100 * index) })}
-                                    key={index}
-                                    cols={pop.cols || 1}
-                                    rows={pop.rows || 1}>
+                            if (item.childs)
+                                return (
                                     <GridListTile
-                                        onMouseEnter={() => this._hoverOn(item)}
-                                        onMouseLeave={() => this._hoverOff(item)}
-                                        className={item.hover == true ? classes.tileHover : classes.tile}>
-                                        {item.images[0] ?
-                                            <img
-                                                src={item.images[0].url}
-                                                alt={item.name}
-                                            /> : null}
-                                        <GridListTileBar
-                                            title={item.name}
-                                            subtitle={item.genres.join(', ')}
-                                            titlePosition="top"
-                                            actionIcon={
-                                                <IconButton className={classes.icon}>
-                                                    <StarBorderIcon />
-                                                </IconButton>
-                                            }
-                                            actionPosition="left"
-                                            className={classes.titleBarTop}
-                                        />
-                                        <GridListTileBar
-                                            title={item.name}
-                                            subtitle={item.genres.join(', ')}
-                                            actionIcon={
-                                                <IconButton className={classes.icon}>
-                                                    <StarBorderIcon />
-                                                </IconButton>
-                                            }
-                                            actionPosition="left"
-                                            className={classes.titleBar}
-                                        />
-                                    </GridListTile>
-                                </Grow>
+                                        key={index}
+                                        cols={2}
+                                        rows={2}
+                                        className={classes.nomargin}
+                                    >
+                                        <GridList spacing={30} cellHeight={160}
+                                            className={classes.nomargin}
+                                        >
+                                            {item.childs && item.childs
+                                                .map((child, child_index) => {
+                                                    return this._GridItem(classes, child, child_index, true)
+                                                })}
+                                        </GridList>
+                                    </GridListTile>)
+                            return (
+                                this._GridItem(classes, item, index, false)
                             )
                         })
                     }

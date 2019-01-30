@@ -42,7 +42,7 @@ export const search = (params) => {
         dispatch({
             type: ActionType.SEARCH_STARTED
         });
-        fetch(`${API}v1/search?q=${params.query}&type=${params.type}`, {
+        fetch(`${API}v1/search?q=${params.query}&type=${params.type}&limit=9`, {
             headers: {
                 'Authorization': `Bearer ${params.token}`
             }
