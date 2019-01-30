@@ -9,6 +9,7 @@ import Paper from '@material-ui/core/Paper';
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
 import GridListTileBar from '@material-ui/core/GridListTileBar';
+import ListSubheader from '@material-ui/core/ListSubheader';
 import IconButton from '@material-ui/core/IconButton';
 import StarBorderIcon from '@material-ui/icons/StarBorder';
 
@@ -40,6 +41,7 @@ const styles = theme => ({
             'rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)',
     },
     titleBarTop: {
+        background: 'none'
     },
     tile: {
     },
@@ -51,6 +53,14 @@ const styles = theme => ({
     },
     nomargin: {
         margin: '0px !important'
+    },
+    flex: {
+        flex: 1,
+        width: '100%'
+    },
+    grow: {
+        flexGrow: 1,
+        width: '100%'
     }
 });
 
@@ -98,17 +108,20 @@ class Home extends Component {
                         src={item.images[0].url}
                         alt={item.name}
                     /> : null}
-                
-                    <GridListTileBar
-                        titlePosition="top"
-                        actionIcon={
-                            <IconButton className={classes.icon}>
-                                <StarBorderIcon />
-                            </IconButton>
-                        }
-                        actionPosition="left"
-                        className={classes.titleBarTop}
-                    />
+
+                <GridListTileBar
+                    className={classes.nomargin}
+                    titlePosition="top"
+                    title={
+                        <Collapse in={item.hover == true} className={classes.nomargin}>
+                            <Paper  className={classes.nomargin}>
+                                <ListSubheader component="div">December</ListSubheader>
+                            </Paper>
+                        </Collapse>
+                    }
+                    actionPosition="left"
+                    className={classes.titleBarTop}
+                />
                 <GridListTileBar
                     title={item.name}
                     subtitle={item.genres.join(', ')}

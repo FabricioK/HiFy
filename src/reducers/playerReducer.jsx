@@ -25,14 +25,18 @@ export const playerReducer = (state = initialState, action) => {
                 list: []
             };
         case ActionType.SEARCH_SUCCESS:
-            const payload = orderBy(action.payload, ['popularity', 'images'], ['desc'])
+            const payload = orderBy(action.payload, ['popularity', 'images'], ['desc']);
+            if (payload.length == 0)
+                return {
+                    ...state,
+                    searching: false
+                };;
             let index = 0;
             const miniaba = groupBy(payload, () => {
                 index++;
                 return (index > 1 && index < 6)
             })
             miniaba.false.splice(1, 0, { childs: miniaba.true });
-            console.log(miniaba.false);
             return {
                 ...state,
                 searching: false,
@@ -54,7 +58,6 @@ export const playerReducer = (state = initialState, action) => {
                     } :
                     item == action.payload ? { ...item, hover: !item.hover } : item)
             });
-            console.log(list);
             return {
                 ...state,
                 list: list
