@@ -17,6 +17,7 @@ import { faHeart } from '@fortawesome/free-solid-svg-icons/faHeart'
 import { faSmile } from '@fortawesome/free-solid-svg-icons/faSmile'
 import Grow from '@material-ui/core/Grow';
 import Collapse from '@material-ui/core/Collapse';
+import Typography from '@material-ui/core/Typography';
 
 const styles = theme => ({
     root: {
@@ -84,7 +85,9 @@ class Home extends Component {
         this.props.toogleHover(e)
     }
     _popularity(is_child, index, pop) {
-        let tag = { text: 'Hot', icon: <FontAwesomeIcon size="2x" icon={faPepperHot} /> };;
+        let tag = {
+            text: "HOT", icon: <FontAwesomeIcon size="2x" icon={faPepperHot} />
+        };;
         if (pop >= 60 && pop <= 79)
             tag = { text: 'Cool', icon: <FontAwesomeIcon size="lg" icon={faHeart} /> };
         if (pop >= 30 && pop <= 59)
@@ -120,7 +123,7 @@ class Home extends Component {
                     title={
                         <Collapse in={item.hover == true} className={classes.nomargin}>
                             <Paper className={classes.nomargin}>
-                                <ListSubheader component="div">{pop.tag.icon}</ListSubheader>
+                                <ListSubheader component="div">{pop.tag.icon} {pop.tag.text}</ListSubheader>
                             </Paper>
                         </Collapse>
                     }
