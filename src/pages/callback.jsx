@@ -14,11 +14,7 @@ class Callback extends Component {
     }
 
     render() {
-        return (
-            <div>
-                 <Redirect to="/"/>
-            </div>
-        )
+        return (<Redirect to="/"/>)
     }
 
 }

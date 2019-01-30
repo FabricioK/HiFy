@@ -2,6 +2,41 @@ import { ActionType, AuthActionType } from "./actionTypes";
 
 const API = 'https://api.spotify.com/'
 
+export const loadUser = (params) => {
+    return (dispatch) => {
+        dispatch({
+            type: AuthActionType.USER_AUTH_START
+        });
+        fetch(`${API}v1/me?`, {
+            headers: {
+                'Authorization': `Bearer ${params.token}`
+            }
+        })
+            .then(response => response.json())
+            .then(
+                (response) => {
+                    if (response.error)
+                        return dispatch({
+                            type: AuthActionType.USER_AUTH_FAILURE,
+                            payload: response.error.message
+                        });
+
+                    dispatch({
+                        type: AuthActionType.USER_AUTH_SUCCESS,
+                        payload: response
+                    });
+                }
+                ,
+                (error) => {
+                    dispatch({
+                        type: AuthActionType.USER_AUTH_FAILURE,
+                        payload: error
+                    })
+                }
+            )
+    }
+}
+
 export const search = (params) => {
     return (dispatch) => {
         dispatch({
