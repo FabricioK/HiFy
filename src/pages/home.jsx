@@ -13,6 +13,7 @@ import IconButton from '@material-ui/core/IconButton';
 import StarBorderIcon from '@material-ui/icons/StarBorder';
 
 import Grow from '@material-ui/core/Grow';
+import Collapse from '@material-ui/core/Collapse';
 
 const styles = theme => ({
     root: {
@@ -37,6 +38,8 @@ const styles = theme => ({
         background:
             'linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, ' +
             'rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)',
+    },
+    titleBarTop: {
     },
     tile: {
     },
@@ -79,7 +82,6 @@ class Home extends Component {
     }
 
     _GridItem = (classes, item, index, is_child) => {
-
         let pop = is_child ? { cols: 1, rows: 1 } : this._popularity(index, item.popularity);
         return <Grow
             in={true}
@@ -96,26 +98,20 @@ class Home extends Component {
                         src={item.images[0].url}
                         alt={item.name}
                     /> : null}
+                
+                    <GridListTileBar
+                        titlePosition="top"
+                        actionIcon={
+                            <IconButton className={classes.icon}>
+                                <StarBorderIcon />
+                            </IconButton>
+                        }
+                        actionPosition="left"
+                        className={classes.titleBarTop}
+                    />
                 <GridListTileBar
                     title={item.name}
                     subtitle={item.genres.join(', ')}
-                    titlePosition="top"
-                    actionIcon={
-                        <IconButton className={classes.icon}>
-                            <StarBorderIcon />
-                        </IconButton>
-                    }
-                    actionPosition="left"
-                    className={classes.titleBarTop}
-                />
-                <GridListTileBar
-                    title={item.name}
-                    subtitle={item.genres.join(', ')}
-                    actionIcon={
-                        <IconButton className={classes.icon}>
-                            <StarBorderIcon />
-                        </IconButton>
-                    }
                     actionPosition="left"
                     className={classes.titleBar}
                 />
@@ -136,11 +132,10 @@ class Home extends Component {
                                         key={index}
                                         cols={2}
                                         rows={2}
-                                        className={classes.nomargin}
-                                    >
-                                        <GridList spacing={30} cellHeight={160}
-                                            className={classes.nomargin}
-                                        >
+                                        className={classes.nomargin}>
+                                        <GridList
+                                            spacing={30} cellHeight={160}
+                                            className={classes.nomargin}>
                                             {item.childs && item.childs
                                                 .map((child, child_index) => {
                                                     return this._GridItem(classes, child, child_index, true)

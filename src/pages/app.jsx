@@ -59,7 +59,7 @@ class App extends Component {
     }
 
     _search = () => {
-        this.props.search({ token: this.props.token, query: this.state.query, type: 'artist' })
+        this.props.search({ token: this.props.token, query: this.state.query, type: 'artist', limit: 9, offset: 0 })
     }
 
     _updateQuery = (event) => {
@@ -68,7 +68,7 @@ class App extends Component {
 
     _handleKeyPress = (e) => {
         if (e.key === 'Enter') {
-            this.props.search({ token: this.props.token, query: this.state.query, type: 'artist' })
+            this.props.search({ token: this.props.token, query: this.state.query, type: 'artist', limit: 9, offset: 0 })
         }
     }
     render() {
@@ -87,14 +87,14 @@ class App extends Component {
                                 className={classes.grow}
                                 onKeyUp={this._handleKeyPress}
                                 onChange={this._updateQuery}
-                            /> : <span className={classes.grow}/>}
+                            /> : <span className={classes.grow} />}
                         {token ?
                             <Button onClick={this._search} color="inherit">Search</Button>
                             :
-                            <Button 
-                                    href={`${process.env.auth_api}?response_type=token&client_id=${process.env.client_id}&scope=${encodeURIComponent(process.env.scopes)}&redirect_uri=${encodeURIComponent(process.env.redirect_uri)}`}
-                                    color="inherit">Login</Button>                                
-                           
+                            <Button
+                                href={`${process.env.auth_api}?response_type=token&client_id=${process.env.client_id}&scope=${encodeURIComponent(process.env.scopes)}&redirect_uri=${encodeURIComponent(process.env.redirect_uri)}`}
+                                color="inherit">Login</Button>
+
 
                         } {error}
                     </Toolbar>
@@ -116,8 +116,8 @@ class App extends Component {
 const mapStateToProps = store => ({
     playing: store.playerState.playing,
     error: store.playerState.error,
-    list: store.playerState.list,    
-    searching : store.playerState.searching,
+    list: store.playerState.list,
+    searching: store.playerState.searching,
     token: store.authState.token,
     user: store.authState.user
 });
