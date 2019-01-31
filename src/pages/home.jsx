@@ -20,6 +20,12 @@ import Grow from '@material-ui/core/Grow';
 import Collapse from '@material-ui/core/Collapse';
 import Typography from '@material-ui/core/Typography';
 
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+
 const styles = theme => ({
     root: {
         backgroundColor: '#f6f6f6',
@@ -71,6 +77,8 @@ const styles = theme => ({
     grow: {
         flexGrow: 1,
         width: '100%'
+    }, tracksArea: {
+        marginTop: 20
     }
 });
 
@@ -82,11 +90,11 @@ class Home extends Component {
             query: ''
         }
     }
-    _hoverOn = (e) => {
-        this.props.toogleHover(e)
+    _hoverOn = (e, t) => {
+        this.props.toogleHover(e, t)
     }
-    _hoverOff = (e) => {
-        this.props.toogleHover(e)
+    _hoverOff = (e, t) => {
+        this.props.toogleHover(e, t)
     }
     _popularity(is_child, index, pop) {
         let tag = {
@@ -102,18 +110,17 @@ class Home extends Component {
         return (index == 0 && !is_child) ?
             { cols: 2, rows: 2, tag } : { cols: 1, rows: 1, tag }
     }
-
-    _GridItem = (classes, item, index, is_child) => {
+    _GridItemArtist = (classes, item, index, is_child) => {
         let pop = this._popularity(is_child, index, item.popularity);
         return <Grow
             in={true}
             {...({ timeout: 1000 + (100 * index) })}
-            key={index}
+            key={`artists_${index}`}
             cols={pop.cols || 1}
             rows={pop.rows || 1}>
             <GridListTile
-                onMouseEnter={() => this._hoverOn(item)}
-                onMouseLeave={() => this._hoverOff(item)}
+                onMouseEnter={() => this._hoverOn(item, 'artists')}
+                onMouseLeave={() => this._hoverOff(item, 'artists')}
                 className={item.hover == true ? classes.tileHover : classes.tile}>
                 {item.images[0] ?
                     <img
@@ -150,14 +157,76 @@ class Home extends Component {
             </GridListTile>
         </Grow>
     }
+    _GridItemAlbum = (classes, item, index, is_child) => {
+        let pop = this._popularity(is_child, index, item.popularity);
+        return <Grow
+            in={true}
+            {...({ timeout: 1000 + (100 * index) })}
+            key={`albums_${index}`}
+            cols={pop.cols || 1}
+            rows={pop.rows || 1}>
+            <GridListTile
+                onMouseEnter={() => this._hoverOn(item, 'albums')}
+                onMouseLeave={() => this._hoverOff(item, 'albums')}
+                className={item.hover == true ? classes.tileHover : classes.tile}>
+                {item.images[0] ?
+                    <img
+                        src={item.images[0].url}
+                        alt={item.name}
+                    /> : null}
 
+                <GridListTileBar
+                    className={classes.nomargin}
+                    titlePosition="top"
+                    title={
+                        <Collapse in={item.hover == true} className={classes.nomargin}>
+                            <Paper className={classes.nomargin}>
+                                <ListSubheader className={classes.flex} component="div">
+                                    <Button target="_blank" href={item.external_urls.spotify}>
+                                        <FontAwesomeIcon size="2x" icon={faSpotify} color="#1DB954" />
+                                    </Button>
+                                </ListSubheader>
+                            </Paper>
+                        </Collapse>
+                    }
+                    actionPosition="left"
+                    className={classes.titleBarTop}
+                />
+                <GridListTileBar
+                    title={item.name}
+                    subtitle={item.artists.length > 1 ? 'Various artists' : item.artists[0].name}
+                    actionPosition="left"
+                    className={classes.titleBar}
+                />
+            </GridListTile>
+        </Grow>
+    }
+
+    _convertMS(millisec) {
+        var seconds = (millisec / 1000).toFixed(0);
+        var minutes = Math.floor(seconds / 60);
+        var hours = "";
+        if (minutes > 59) {
+            hours = Math.floor(minutes / 60);
+            hours = (hours >= 10) ? hours : "0" + hours;
+            minutes = minutes - (hours * 60);
+            minutes = (minutes >= 10) ? minutes : "0" + minutes;
+        }
+
+        seconds = Math.floor(seconds % 60);
+        seconds = (seconds >= 10) ? seconds : "0" + seconds;
+        if (hours != "") {
+            return hours + ":" + minutes + ":" + seconds;
+        }
+        return minutes + ":" + seconds;
+    }
     render() {
-        const { classes, playing, artists } = this.props;
+        const { classes, playing, artists, albums, tracks } = this.props;
         return (
             <Paper className={classes.root}>
                 <GridList spacing={30} cellHeight={190} cols={4}>
-                    {artists && artists.length > 0?
-                        <GridListTile key="Subheader" cols={4} style={{ height: 'auto' }}>
+                    {artists && artists.length > 0 ?
+                        <GridListTile key="Subheader_Artistis" cols={4} style={{ height: 'auto' }}>
                             <ListSubheader component="div"><Typography variant="h4" color="primary">Artists</Typography></ListSubheader>
                         </GridListTile> : null
                     }
@@ -175,16 +244,81 @@ class Home extends Component {
                                             className={classes.nomargin}>
                                             {item.childs && item.childs
                                                 .map((child, child_index) => {
-                                                    return this._GridItem(classes, child, child_index, true)
+                                                    return this._GridItemArtist(classes, child, child_index, true)
                                                 })}
                                         </GridList>
                                     </GridListTile>)
-                            return (
-                                this._GridItem(classes, item, index, false)
-                            )
+                            return this._GridItemArtist(classes, item, index, false)
+                        })
+                    }
+                    {albums && albums.length > 0 ?
+                        <GridListTile key="Subheader_Albums" cols={4} style={{ height: 'auto' }}>
+                            <ListSubheader component="div"><Typography variant="h4" color="primary">Albums</Typography></ListSubheader>
+                        </GridListTile> : null
+                    }
+                    {albums && albums
+                        .map((item, index) => {
+                            if (item.childs)
+                                return (
+                                    <GridListTile
+                                        key={index}
+                                        cols={2}
+                                        rows={2}
+                                        className={classes.nomargin}>
+                                        <GridList
+                                            spacing={30} cellHeight={160}
+                                            className={classes.nomargin}>
+                                            {item.childs && item.childs
+                                                .map((child, child_index) => {
+                                                    return this._GridItemAlbum(classes, child, child_index, true)
+                                                })}
+                                        </GridList>
+                                    </GridListTile>)
+                            return this._GridItemAlbum(classes, item, index, false)
+
                         })
                     }
                 </GridList>
+                {tracks && tracks.length > 0 ?
+                    <div className={classes.tracksArea}>
+                        <Typography variant="h4" color="primary">Tracks</Typography>
+                        <Table className={classes.grow}>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell ></TableCell>
+                                    <TableCell >Track</TableCell>
+                                    <TableCell >Album</TableCell>
+                                    <TableCell >Duration</TableCell>
+                                    <TableCell></TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {tracks.map((row, index) => (
+                                    <TableRow key={`track_${index}`}>
+                                        <TableCell component="th" scope="row">
+                                            {row.album && row.album.images[0] ?
+                                                <img
+                                                    src={row.album.images[0].url}
+                                                    alt={row.name}
+                                                    width={50}
+                                                /> : null}
+                                        </TableCell>
+                                        <TableCell>
+                                            <Typography variant="subtitle1">{row.name}</Typography>
+                                            {row.artists.map(a => a.name).join(', ')}</TableCell>
+                                        <TableCell>{row.album.name}</TableCell>
+                                        <TableCell align="right">{this._convertMS(row.duration_ms)}</TableCell>
+                                        <TableCell align="right">
+                                            <Button target="_blank" href={row.external_urls.spotify}>
+                                                <FontAwesomeIcon size="2x" icon={faSpotify} color="#1DB954" />
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
+                    : null}
             </Paper >
         )
     }
@@ -193,6 +327,8 @@ const mapStateToProps = store => ({
     playing: store.playerState.playing,
     error: store.playerState.error,
     artists: store.playerState.artists,
+    albums: store.playerState.albums,
+    tracks: store.playerState.tracks,
     token: store.authState.token
 });
 

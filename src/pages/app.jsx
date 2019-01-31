@@ -91,7 +91,7 @@ class App extends Component {
         super(props)
         this.state = {
             query: '',
-            types: ['artist', 'album', 'track']
+            types: ['track']
         }
     }
 
