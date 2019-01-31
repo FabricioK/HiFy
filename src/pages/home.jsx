@@ -11,11 +11,12 @@ import GridListTile from '@material-ui/core/GridListTile';
 import GridListTileBar from '@material-ui/core/GridListTileBar';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSpotify } from '@fortawesome/free-brands-svg-icons/faSpotify';
 import { faPepperHot } from '@fortawesome/free-solid-svg-icons/faPepperHot';
 import { faUserNinja } from '@fortawesome/free-solid-svg-icons/faUserNinja';
 import { faHeart } from '@fortawesome/free-solid-svg-icons/faHeart';
 import { faSmile } from '@fortawesome/free-solid-svg-icons/faSmile';
-import { faSpotify } from '@fortawesome/free-brands-svg-icons/faSpotify';
+
 import Grow from '@material-ui/core/Grow';
 import Collapse from '@material-ui/core/Collapse';
 import Typography from '@material-ui/core/Typography';
@@ -221,7 +222,8 @@ class Home extends Component {
         return minutes + ":" + seconds;
     }
     render() {
-        const { classes, playing, artists, albums, tracks } = this.props;
+        const { classes, playing, artists, albums, tracks, user } = this.props;
+      
         return (
             <Paper className={classes.root}>
                 <GridList spacing={30} cellHeight={190} cols={4}>
@@ -329,6 +331,7 @@ const mapStateToProps = store => ({
     artists: store.playerState.artists,
     albums: store.playerState.albums,
     tracks: store.playerState.tracks,
+    user: store.authState.user,
     token: store.authState.token
 });
 

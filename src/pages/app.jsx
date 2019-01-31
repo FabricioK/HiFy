@@ -5,9 +5,10 @@ import { bindActionCreators } from 'redux';
 import { withStyles } from '@material-ui/core/styles';
 import Route from "react-router-dom/Route";
 
+import Avatar from '@material-ui/core/Avatar';
+
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
-import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import InputBase from '@material-ui/core/InputBase';
 import IconButton from '@material-ui/core/IconButton';
@@ -15,16 +16,20 @@ import SearchIcon from '@material-ui/icons/Search';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Typography from '@material-ui/core/Typography';
 import Input from '@material-ui/core/Input';
-import InputLabel from '@material-ui/core/InputLabel';
+
+import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
+
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import Chip from '@material-ui/core/Chip';
 
-import { search, loadUser } from '../actions'
+import { search, loadUser, logoff } from '../actions'
 
 import Home from './home';
 import Callback from './callback';
+import Login from './login';
 
 const styles = theme => ({
     root: {
@@ -71,6 +76,12 @@ const styles = theme => ({
     },
     noLabel: {
         marginTop: theme.spacing.unit * 3,
+    },
+    flex: {
+        flex: 1,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'flex-end'
     }
 });
 
@@ -85,13 +96,14 @@ const MenuProps = {
     },
 };
 const types = ['artist', 'album', 'track'];
-
+const options = ['Favorites', 'Loggout']
 class App extends Component {
     constructor(props) {
         super(props)
         this.state = {
             query: '',
-            types: ['track']
+            types: ['track'],
+            anchorEl: null,
         }
     }
 
@@ -100,6 +112,16 @@ class App extends Component {
             this.props.loadUser({ token: this.props.token });
         }
     }
+
+    _handleClick = event => {
+        this.setState({ anchorEl: event.currentTarget });
+    };
+
+    _handleClose = (e, option) => {
+        this.setState({ anchorEl: null });
+        if ('Loggout' === option)
+            this.props.logoff();
+    };
 
     _search = () => {
         if (this.state.types.length > 0)
@@ -125,62 +147,92 @@ class App extends Component {
                     : that.props.theme.typography.fontWeightMedium,
         };
     }
+
+    _loggedMenu = (classes, user) => {
+        const { anchorEl } = this.state;
+        const open = Boolean(anchorEl);
+        return (
+            <Toolbar className={classes.toolbar}>
+                <Typography variant="h6" >Searching for</Typography>
+                <FormControl className={classes.formControl}>
+                    <Select
+                        multiple
+                        value={this.state.types}
+                        onChange={this._handleChange}
+                        input={<Input id="select-multiple-chip" />}
+                        renderValue={selected => (
+                            <div className={classes.chips}>
+                                {selected.map(value => (
+                                    <Chip key={value} label={value} className={classes.chip} />
+                                ))}
+                            </div>
+                        )}
+                        MenuProps={MenuProps}
+                    >
+                        {types.map(name => (
+                            <MenuItem key={name} value={name} style={this._getStyles(name, this)}>
+                                {name}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+                <Typography variant="h6" >with name containing </Typography>
+
+                <Paper className={classes.searchBar} elevation={1}>
+                    <InputBase
+                        className={classes.input}
+                        placeholder="Search ..."
+                        name="search"
+                        type="text"
+                        className={classes.searchBar}
+                        onKeyUp={this._handleKeyPress}
+                        onChange={this._updateQuery}
+                    />
+                    <IconButton className={classes.iconButton} onClick={this._search} aria-label="Search">
+                        <SearchIcon />
+                    </IconButton>
+                </Paper>
+                {user.images ?
+                    <div className={classes.flex}><Avatar alt={user.display_name} src={user.images[0].url} className={classes.avatar} />
+                        <Typography variant="subtitle1" >{user.display_name}</Typography>
+                    </div> : null}
+                <IconButton
+                    aria-label="More"
+                    aria-owns={open ? 'long-menu' : undefined}
+                    aria-haspopup="true"
+                    onClick={this._handleClick}
+                >
+                    <MoreVertIcon />
+                </IconButton>
+                <Menu
+                    id="long-menu"
+                    anchorEl={anchorEl}
+                    open={open}
+                    onClose={this.handleClose}
+                    PaperProps={{
+                        style: {
+                            maxHeight: ITEM_HEIGHT * 4.5,
+                            width: 200,
+                        },
+                    }}
+                >
+                    {options.map(option => (
+                        <MenuItem key={option} onClick={(e) => this._handleClose(e, option)}>
+                            {option}
+                        </MenuItem>
+                    ))}
+                </Menu>
+            </Toolbar>
+        )
+    }
     render() {
-        const { classes, error, token, searching, user } = this.props;
+        const { classes, error, searching, user } = this.props;
         return (
             <div className={classes.root}>
                 <AppBar position="absolute">
-                    <Toolbar className={classes.toolbar}>
-                        <Typography variant="h6" >Searching for</Typography>
-                        <FormControl className={classes.formControl}>
-                            <Select
-                                multiple
-                                value={this.state.types}
-                                onChange={this._handleChange}
-                                input={<Input id="select-multiple-chip" />}
-                                renderValue={selected => (
-                                    <div className={classes.chips}>
-                                        {selected.map(value => (
-                                            <Chip key={value} label={value} className={classes.chip} />
-                                        ))}
-                                    </div>
-                                )}
-                                MenuProps={MenuProps}
-                            >
-                                {types.map(name => (
-                                    <MenuItem key={name} value={name} style={this._getStyles(name, this)}>
-                                        {name}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                        <Typography variant="h6" >with name containing </Typography>
-                        {token ?
-                            <Paper className={classes.searchBar} elevation={1}>
-                                <InputBase
-                                    className={classes.input}
-                                    placeholder="Search ..."
-                                    name="search"
-                                    type="text"
-                                    className={classes.searchBar}
-                                    onKeyUp={this._handleKeyPress}
-                                    onChange={this._updateQuery}
-                                />
-                                <IconButton className={classes.iconButton} onClick={this._search} aria-label="Search">
-                                    <SearchIcon />
-                                </IconButton>
-                            </Paper>
-                            : <span className={classes.grow} />}
-                        {token ?
-                            null
-                            :
-                            <Button
-                                href={`${process.env.auth_api}?response_type=token&client_id=${process.env.client_id}&scope=${encodeURIComponent(process.env.scopes)}&redirect_uri=${encodeURIComponent(process.env.redirect_uri)}`}
-                                color="inherit">Login</Button>
 
-
-                        } {error}
-                    </Toolbar>
+                    {user ?
+                        this._loggedMenu(classes, user) : null}
                     <div className={classes.grow}>
                         {searching ?
                             <LinearProgress />
@@ -188,10 +240,22 @@ class App extends Component {
                     </div>
                 </AppBar>
                 <div className={classes.pages}>
-                    <Route exact path="/" component={Home} />
-                    <Route exact path="/callback:access_token?" component={Callback} />
+                    <Route exact path="/" render={() => (
+                        user ? (
+                            <Home />
+                        ) : (
+                                <Login />
+                            )
+                    )} />
+                    <Route exact path="/callback:access_token?" render={() => (
+                        user ? (
+                            <Redirect to="/" />
+                        ) : (
+                                <Callback />
+                            )
+                    )} />
                 </div>
-            </div>
+            </div >
         );
     }
 }
@@ -206,6 +270,6 @@ const mapStateToProps = store => ({
 });
 
 const mapDispatchToProps = dispatch =>
-    bindActionCreators({ search, loadUser }, dispatch);
+    bindActionCreators({ search, loadUser, logoff }, dispatch);
 
 export default withStyles(styles, { withTheme: true })(connect(mapStateToProps, mapDispatchToProps)(App));

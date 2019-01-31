@@ -77,6 +77,10 @@ export const setToken = token => ({
     payload: token
 });
 
+export const logoff = () => ({
+    type: AuthActionType.LOGOFF
+});
+
 export const toogleHover = (item, type) => ({
     type: ActionType.HOVER,
     payload: { item, type }

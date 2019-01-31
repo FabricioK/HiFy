@@ -40,6 +40,14 @@ export const authReducer = (state = initialState, action) => {
                 logging: false,
                 user: action.payload
             };
+        case AuthActionType.LOGOFF:
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
+            return {
+                ...state,
+                user: null,
+                token: null
+            };
         case AuthActionType.USER_AUTH_FAILURE:
             localStorage.removeItem('user');
             localStorage.removeItem('token');
@@ -47,7 +55,7 @@ export const authReducer = (state = initialState, action) => {
                 ...state,
                 logging: false,
                 user: null,
-                token : null,
+                token: null,
                 error: action.payload
             };
         default:
