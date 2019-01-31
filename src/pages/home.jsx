@@ -5,23 +5,24 @@ import { playButton, setToken, toogleHover } from '../actions'
 
 import { withStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
-
+import Button from '@material-ui/core/Button';
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
 import GridListTileBar from '@material-ui/core/GridListTileBar';
 import ListSubheader from '@material-ui/core/ListSubheader';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPepperHot } from '@fortawesome/free-solid-svg-icons/faPepperHot'
-import { faUserNinja } from '@fortawesome/free-solid-svg-icons/faUserNinja'
-import { faHeart } from '@fortawesome/free-solid-svg-icons/faHeart'
-import { faSmile } from '@fortawesome/free-solid-svg-icons/faSmile'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPepperHot } from '@fortawesome/free-solid-svg-icons/faPepperHot';
+import { faUserNinja } from '@fortawesome/free-solid-svg-icons/faUserNinja';
+import { faHeart } from '@fortawesome/free-solid-svg-icons/faHeart';
+import { faSmile } from '@fortawesome/free-solid-svg-icons/faSmile';
+import { faSpotify } from '@fortawesome/free-brands-svg-icons/faSpotify';
 import Grow from '@material-ui/core/Grow';
 import Collapse from '@material-ui/core/Collapse';
 import Typography from '@material-ui/core/Typography';
 
 const styles = theme => ({
     root: {
-        backgroundColor: '#d6d6d6',
+        backgroundColor: '#f6f6f6',
         width: '80vw',
         marginTop: '20vh',
         minHeight: '70vh',
@@ -61,8 +62,11 @@ const styles = theme => ({
         margin: '0px !important'
     },
     flex: {
-        flex: 1,
-        width: '100%'
+        display: "flex",
+        flexDirection: "row",
+        width: '100%',
+        alignItems: 'center',
+        justifyContent: 'space-around'
     },
     grow: {
         flexGrow: 1,
@@ -86,14 +90,14 @@ class Home extends Component {
     }
     _popularity(is_child, index, pop) {
         let tag = {
-            text: "HOT", icon: <FontAwesomeIcon size="2x" icon={faPepperHot} />
+            text: "HOT", icon: <FontAwesomeIcon icon={faPepperHot} />
         };;
         if (pop >= 60 && pop <= 79)
-            tag = { text: 'Cool', icon: <FontAwesomeIcon size="lg" icon={faHeart} /> };
+            tag = { text: 'Cool', icon: <FontAwesomeIcon icon={faHeart} /> };
         if (pop >= 30 && pop <= 59)
-            tag = { text: 'Regular', icon: <FontAwesomeIcon size="lg" icon={faSmile} /> };
+            tag = { text: 'Regular', icon: <FontAwesomeIcon icon={faSmile} /> };
         if (pop <= 30)
-            tag = { text: 'Underground', icon: <FontAwesomeIcon size="lg" icon={faUserNinja} /> };
+            tag = { text: 'Underground', icon: <FontAwesomeIcon icon={faUserNinja} /> };
 
         return (index == 0 && !is_child) ?
             { cols: 2, rows: 2, tag } : { cols: 1, rows: 1, tag }
@@ -123,7 +127,14 @@ class Home extends Component {
                     title={
                         <Collapse in={item.hover == true} className={classes.nomargin}>
                             <Paper className={classes.nomargin}>
-                                <ListSubheader component="div">{pop.tag.icon} {pop.tag.text}</ListSubheader>
+                                <ListSubheader className={classes.flex} component="div">
+                                    <div>
+                                        {pop.tag.text}  {pop.tag.icon}
+                                    </div>
+                                    <Button target="_blank" href={item.external_urls.spotify}>
+                                        <FontAwesomeIcon size="2x" icon={faSpotify} color="#1DB954" />
+                                    </Button>
+                                </ListSubheader>
                             </Paper>
                         </Collapse>
                     }
@@ -141,11 +152,16 @@ class Home extends Component {
     }
 
     render() {
-        const { classes, playing, list } = this.props;
+        const { classes, playing, artists } = this.props;
         return (
             <Paper className={classes.root}>
                 <GridList spacing={30} cellHeight={190} cols={4}>
-                    {list && list
+                    {artists && artists.length > 0?
+                        <GridListTile key="Subheader" cols={4} style={{ height: 'auto' }}>
+                            <ListSubheader component="div"><Typography variant="h4" color="primary">Artists</Typography></ListSubheader>
+                        </GridListTile> : null
+                    }
+                    {artists && artists
                         .map((item, index) => {
                             if (item.childs)
                                 return (
@@ -176,7 +192,7 @@ class Home extends Component {
 const mapStateToProps = store => ({
     playing: store.playerState.playing,
     error: store.playerState.error,
-    list: store.playerState.list,
+    artists: store.playerState.artists,
     token: store.authState.token
 });
 

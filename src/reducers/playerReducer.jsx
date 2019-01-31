@@ -6,7 +6,9 @@ import without from 'lodash/without';
 const initialState = {
     playing: false,
     searching: false,
-    list: [],
+    artists: [],
+    albuns: [],
+    tracks: [],
     error: ''
 };
 export const playerReducer = (state = initialState, action) => {
@@ -22,25 +24,64 @@ export const playerReducer = (state = initialState, action) => {
                 ...state,
                 searching: true,
                 error: '',
-                list: []
+                artists: []
             };
         case ActionType.SEARCH_SUCCESS:
-            const payload = orderBy(action.payload, ['popularity', 'images'], ['desc']);
-            if (payload.length == 0)
-                return {
-                    ...state,
-                    searching: false
-                };;
-            let index = 0;
-            const miniaba = groupBy(payload, () => {
-                index++;
-                return (index > 1 && index < 6)
-            })
-            miniaba.false.splice(1, 0, { childs: miniaba.true });
+            const result = action.payload
+            let artists = [];
+            let albuns = [];
+            let tracks = [];
+            if (result.artists && result.artists.items) {
+                const payload = orderBy(result.artists.items, ['popularity', 'images'], ['desc']);
+                if (payload.length == 0)
+                    return {
+                        ...state,
+                        searching: false
+                    };;
+                let index = 0;
+                const miniaba = groupBy(payload, () => {
+                    index++;
+                    return (index > 1 && index < 6)
+                })
+                miniaba.false.splice(1, 0, { childs: miniaba.true });
+                artists = miniaba.false
+            }
+            if (result.albuns && result.albuns.items) {
+                const payload = orderBy(result.albuns.items, ['popularity', 'images'], ['desc']);
+                if (payload.length == 0)
+                    return {
+                        ...state,
+                        searching: false
+                    };;
+                let index = 0;
+                const miniaba = groupBy(payload, () => {
+                    index++;
+                    return (index > 1 && index < 6)
+                })
+                miniaba.false.splice(1, 0, { childs: miniaba.true });
+                albuns = miniaba.false
+            }
+            if (result.tracks && result.tracks.items) {
+                const payload = orderBy(result.tracks.items, ['popularity', 'images'], ['desc']);
+                if (payload.length == 0)
+                    return {
+                        ...state,
+                        searching: false
+                    };;
+                let index = 0;
+                const miniaba = groupBy(payload, () => {
+                    index++;
+                    return (index > 1 && index < 6)
+                })
+                miniaba.false.splice(1, 0, { childs: miniaba.true });
+                tracks = miniaba.false
+            }
             return {
                 ...state,
                 searching: false,
-                list: miniaba.false
+                artists,
+                albuns,
+                tracks,
             };
         case ActionType.SEARCH_FAILURE:
             return {
@@ -49,18 +90,23 @@ export const playerReducer = (state = initialState, action) => {
                 error: action.payload
             };
         case ActionType.HOVER:
-            const list = state.list.map(item => {
-                return (item.childs ?
-                    {
-                        childs: item.childs.map(child => {
-                            return child == action.payload ? { ...child, hover: !child.hover } : child
-                        })
-                    } :
-                    item == action.payload ? { ...item, hover: !item.hover } : item)
-            });
+            var { artists, albuns, tracks } = state
+            if (action.payload == 'artists')
+                artists = state.artists.map(item => {
+                    return (item.childs ?
+                        {
+                            childs: item.childs.map(child => {
+                                return child == action.payload ? { ...child, hover: !child.hover } : child
+                            })
+                        } :
+                        item == action.payload ? { ...item, hover: !item.hover } : item)
+                });
+
             return {
                 ...state,
-                list: list
+                artists,
+                albuns,
+                tracks
             }
         default:
             return state;

@@ -58,7 +58,7 @@ export const search = (params) => {
 
                     dispatch({
                         type: ActionType.SEARCH_SUCCESS,
-                        payload: response.artists.items
+                        payload: response
                     });
                 }
                 ,
