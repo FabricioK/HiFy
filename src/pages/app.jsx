@@ -49,7 +49,9 @@ const styles = theme => ({
     },
     toolbar: {
         flexDirection: 'row',
-        justifyContent: 'flex-start'
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        backgroundColor: "#2196f3"
     },
     searchBar: {
         marginLeft: 10,
@@ -73,6 +75,8 @@ const styles = theme => ({
     },
     chip: {
         margin: theme.spacing.unit / 4,
+        color : "#2196f3",
+        backgroundColor:'white'
     },
     noLabel: {
         marginTop: theme.spacing.unit * 3,
@@ -82,6 +86,9 @@ const styles = theme => ({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'flex-end'
+    },
+    typography: {
+        color: 'white !important',
     }
 });
 
@@ -121,6 +128,8 @@ class App extends Component {
         this.setState({ anchorEl: null });
         if ('Loggout' === option)
             this.props.logoff();
+        if ('Favorites' === option)
+            this.props.logoff();
     };
 
     _search = () => {
@@ -153,69 +162,70 @@ class App extends Component {
         const open = Boolean(anchorEl);
         return (
             <Toolbar className={classes.toolbar}>
-                <Typography variant="h6" >Searching for</Typography>
-                <FormControl className={classes.formControl}>
-                    <Select
-                        multiple
-                        value={this.state.types}
-                        onChange={this._handleChange}
-                        input={<Input id="select-multiple-chip" />}
-                        renderValue={selected => (
-                            <div className={classes.chips}>
-                                {selected.map(value => (
-                                    <Chip key={value} label={value} className={classes.chip} />
-                                ))}
-                            </div>
-                        )}
-                        MenuProps={MenuProps}
-                    >
-                        {types.map(name => (
-                            <MenuItem key={name} value={name} style={this._getStyles(name, this)}>
-                                {name}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
-                <Typography variant="h6" >with name containing </Typography>
+                <div className={classes.flex}>
+                    <Typography variant="h6" className={classes.typography} >Searching for</Typography>
+                    <FormControl className={classes.formControl}>
+                        <Select
+                            multiple
+                            value={this.state.types}
+                            onChange={this._handleChange}
+                            input={<Input id="select-multiple-chip" />}
+                            renderValue={selected => (
+                                <div className={classes.chips}>
+                                    {selected.map(value => (
+                                        <Chip key={value} label={value} className={classes.chip} />
+                                    ))}
+                                </div>
+                            )}
+                            MenuProps={MenuProps}
+                        >
+                            {types.map(name => (
+                                <MenuItem key={name} value={name} style={this._getStyles(name, this)}>
+                                    {name}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                    <Typography variant="h6" className={classes.typography}>with name containing </Typography>
 
-                <Paper className={classes.searchBar} elevation={1}>
-                    <InputBase
-                        className={classes.input}
-                        placeholder="Search ..."
-                        name="search"
-                        type="text"
-                        className={classes.searchBar}
-                        onKeyUp={this._handleKeyPress}
-                        onChange={this._updateQuery}
-                    />
-                    <IconButton className={classes.iconButton} onClick={this._search} aria-label="Search">
-                        <SearchIcon />
-                    </IconButton>
-                </Paper>
+                    <Paper className={classes.searchBar} elevation={1}>
+                        <InputBase
+                            className={classes.input}
+                            placeholder="Search ..."
+                            name="search"
+                            type="text"
+                            className={classes.searchBar}
+                            onKeyUp={this._handleKeyPress}
+                            onChange={this._updateQuery}
+                        />
+                        <IconButton className={classes.iconButton} onClick={this._search} aria-label="Search">
+                            <SearchIcon />
+                        </IconButton>
+                    </Paper>
+                </div>
                 {user.images ?
                     <div className={classes.flex}><Avatar alt={user.display_name} src={user.images[0].url} className={classes.avatar} />
-                        <Typography variant="subtitle1" >{user.display_name}</Typography>
+                        <Typography variant="subtitle1" className={classes.typography}>{user.display_name}</Typography>
                     </div> : null}
                 <IconButton
+                    className={classes.typography}
                     aria-label="More"
                     aria-owns={open ? 'long-menu' : undefined}
                     aria-haspopup="true"
-                    onClick={this._handleClick}
-                >
+                    onClick={this._handleClick}>
                     <MoreVertIcon />
                 </IconButton>
                 <Menu
                     id="long-menu"
                     anchorEl={anchorEl}
                     open={open}
-                    onClose={this.handleClose}
+                    onClose={this._handleClose}
                     PaperProps={{
                         style: {
                             maxHeight: ITEM_HEIGHT * 4.5,
                             width: 200,
                         },
-                    }}
-                >
+                    }}>
                     {options.map(option => (
                         <MenuItem key={option} onClick={(e) => this._handleClose(e, option)}>
                             {option}
@@ -230,30 +240,15 @@ class App extends Component {
         return (
             <div className={classes.root}>
                 <AppBar position="absolute">
-
                     {user ?
                         this._loggedMenu(classes, user) : null}
                     <div className={classes.grow}>
-                        {searching ?
-                            <LinearProgress />
-                            : null}
+                        {searching ? <LinearProgress /> : null}
                     </div>
                 </AppBar>
                 <div className={classes.pages}>
-                    <Route exact path="/" render={() => (
-                        user ? (
-                            <Home />
-                        ) : (
-                                <Login />
-                            )
-                    )} />
-                    <Route exact path="/callback:access_token?" render={() => (
-                        user ? (
-                            <Redirect to="/" />
-                        ) : (
-                                <Callback />
-                            )
-                    )} />
+                    <Route exact path="/" render={() => (user ? (<Home />) : (<Login />))} />
+                    <Route exact path="/callback:access_token?" render={() => (user ? (<Redirect to="/" />) : (<Callback />))} />
                 </div>
             </div >
         );
