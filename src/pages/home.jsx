@@ -123,9 +123,9 @@ class Home extends Component {
                 onMouseEnter={() => this._hoverOn(item, 'artists')}
                 onMouseLeave={() => this._hoverOff(item, 'artists')}
                 className={item.hover == true ? classes.tileHover : classes.tile}>
-                {item.images[0] ?
+                {item.image ?
                     <img
-                        src={item.images[0].url}
+                        src={item.image}
                         alt={item.name}
                     /> : null}
 
@@ -139,7 +139,7 @@ class Home extends Component {
                                     <div>
                                         {pop.tag.text}  {pop.tag.icon}
                                     </div>
-                                    <Button target="_blank" href={item.external_urls.spotify}>
+                                    <Button target="_blank" href={item.external_urls}>
                                         <FontAwesomeIcon size="2x" icon={faSpotify} color="#1DB954" />
                                     </Button>
                                 </ListSubheader>
@@ -151,7 +151,7 @@ class Home extends Component {
                 />
                 <GridListTileBar
                     title={item.name}
-                    subtitle={item.genres.join(', ')}
+                    subtitle={item.genres}
                     actionPosition="left"
                     className={classes.titleBar}
                 />
@@ -170,9 +170,9 @@ class Home extends Component {
                 onMouseEnter={() => this._hoverOn(item, 'albums')}
                 onMouseLeave={() => this._hoverOff(item, 'albums')}
                 className={item.hover == true ? classes.tileHover : classes.tile}>
-                {item.images[0] ?
+                {item.image ?
                     <img
-                        src={item.images[0].url}
+                        src={item.image}
                         alt={item.name}
                     /> : null}
 
@@ -183,7 +183,7 @@ class Home extends Component {
                         <Collapse in={item.hover == true} className={classes.nomargin}>
                             <Paper className={classes.nomargin}>
                                 <ListSubheader className={classes.flex} component="div">
-                                    <Button target="_blank" href={item.external_urls.spotify}>
+                                    <Button target="_blank" href={item.external_urls}>
                                         <FontAwesomeIcon size="2x" icon={faSpotify} color="#1DB954" />
                                     </Button>
                                 </ListSubheader>
@@ -195,7 +195,7 @@ class Home extends Component {
                 />
                 <GridListTileBar
                     title={item.name}
-                    subtitle={item.artists.length > 1 ? 'Various artists' : item.artists[0].name}
+                    subtitle={item.artists}
                     actionPosition="left"
                     className={classes.titleBar}
                 />
@@ -203,24 +203,6 @@ class Home extends Component {
         </Grow>
     }
 
-    _convertMS(millisec) {
-        var seconds = (millisec / 1000).toFixed(0);
-        var minutes = Math.floor(seconds / 60);
-        var hours = "";
-        if (minutes > 59) {
-            hours = Math.floor(minutes / 60);
-            hours = (hours >= 10) ? hours : "0" + hours;
-            minutes = minutes - (hours * 60);
-            minutes = (minutes >= 10) ? minutes : "0" + minutes;
-        }
-
-        seconds = Math.floor(seconds % 60);
-        seconds = (seconds >= 10) ? seconds : "0" + seconds;
-        if (hours != "") {
-            return hours + ":" + minutes + ":" + seconds;
-        }
-        return minutes + ":" + seconds;
-    }
     render() {
         const { classes, playing, artists, albums, tracks, user } = this.props;
 
@@ -298,23 +280,24 @@ class Home extends Component {
                                 {tracks.map((row, index) => (
                                     <TableRow key={`track_${index}`}>
                                         <TableCell component="th" scope="row">
-                                            {row.album && row.album.images[0] ?
+                                            <Button onClick={() => this.props.addFavorite(user.id, row)}> Add this </Button>
+                                            {row.album_images ?
                                                 <img
-                                                    src={row.album.images[0].url}
+                                                    src={row.album_images}
                                                     alt={row.name}
                                                     width={50}
                                                 /> : null}
-                                            <Button onClick={() => this.props.addFavorite(user.id, row)}>
-                                                Add this
-                                                </Button>
                                         </TableCell>
                                         <TableCell>
-                                            <Typography variant="subtitle1">{row.name}</Typography>
-                                            {row.artists.map(a => a.name).join(', ')}</TableCell>
-                                        <TableCell>{row.album.name}</TableCell>
-                                        <TableCell align="right">{this._convertMS(row.duration_ms)}</TableCell>
+                                            <Typography variant="subtitle1">
+                                                {row.name}
+                                            </Typography>
+                                            {row.artists_name}
+                                        </TableCell>
+                                        <TableCell>{row.album_name}</TableCell>
+                                        <TableCell align="right">{row.duration_ms}</TableCell>
                                         <TableCell align="right">
-                                            <Button target="_blank" href={row.external_urls.spotify}>
+                                            <Button target="_blank" href={row.external_urls}>
                                                 <FontAwesomeIcon size="2x" icon={faSpotify} color="#1DB954" />
                                             </Button>
                                         </TableCell>

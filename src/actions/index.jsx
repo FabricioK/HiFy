@@ -96,8 +96,13 @@ export const addFavorite = (user_id, track) => {
     return (dispatch) => {
         db.tracks.add({
             user_id,
-            track_id: track.id,
-            name: track.name
+            track_id: track.track_id,
+            name: track.name,
+            album_name : track.album_name,
+            artists_name : track.artists_name,
+            album_images : track.album_images,
+            external_urls : track.external_urls,
+            duration_ms: track.duration_ms
         }).then(
             (result) => {
                 dispatch({

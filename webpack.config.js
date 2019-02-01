@@ -23,7 +23,7 @@ module.exports = env => {
     })
     
     return {
-        entry: __dirname + "/src/index.jsx",
+        entry: ['@babel/polyfill', __dirname + "/src/index.jsx"],
         output: {
             path: __dirname + '/dist',
             filename: 'hify-min.js'

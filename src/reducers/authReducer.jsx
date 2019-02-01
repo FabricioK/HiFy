@@ -35,7 +35,6 @@ export const authReducer = (state = initialState, action) => {
             };
         case AuthActionType.USER_AUTH_SUCCESS:
             localStorage.setItem('user', JSON.stringify(action.payload));
-            console.log(action.payload);
             return {
                 ...state,
                 logging: false,

@@ -19,9 +19,12 @@ import LinearProgress from '@material-ui/core/LinearProgress';
 import Typography from '@material-ui/core/Typography';
 import Input from '@material-ui/core/Input';
 
-import Menu from '@material-ui/core/Menu';
+import MenuList from '@material-ui/core/MenuList';
 import MenuItem from '@material-ui/core/MenuItem';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
+import Popper from '@material-ui/core/Popper';
+import ClickAwayListener from '@material-ui/core/ClickAwayListener';
+import Grow from '@material-ui/core/Grow';
 
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
@@ -72,8 +75,6 @@ const styles = theme => ({
         maxWidth: 300,
     },
     chips: {
-        display: 'flex',
-        flexWrap: 'wrap',
     },
     chip: {
         margin: theme.spacing.unit / 4,
@@ -97,6 +98,15 @@ const styles = theme => ({
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
+    transformOrigin: {
+        vertical: 'top',
+        horizontal: 'left'
+    },
+    getContentAnchorEl: null,
+    anchorOrigin: {
+      vertical: "bottom",
+      horizontal: "left",
+    },
     PaperProps: {
         style: {
             maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
@@ -174,15 +184,14 @@ class App extends Component {
                             value={this.state.types}
                             onChange={this._handleChange}
                             input={<Input id="select-multiple-chip" />}
+                            MenuProps={MenuProps}
                             renderValue={selected => (
                                 <div className={classes.chips}>
                                     {selected.map(value => (
                                         <Chip key={value} label={value} className={classes.chip} />
                                     ))}
                                 </div>
-                            )}
-                            MenuProps={MenuProps}
-                        >
+                            )}>
                             {types.map(name => (
                                 <MenuItem key={name} value={name} style={this._getStyles(name, this)}>
                                     {name}
@@ -219,23 +228,26 @@ class App extends Component {
                     onClick={this._handleClick}>
                     <MoreVertIcon />
                 </IconButton>
-                <Menu
-                    id="long-menu"
-                    anchorEl={anchorEl}
-                    open={open}
-                    onClose={this._handleClose}
-                    PaperProps={{
-                        style: {
-                            maxHeight: ITEM_HEIGHT * 4.5,
-                            width: 200,
-                        },
-                    }}>
-                    {options.map(option => (
-                        <MenuItem key={option} onClick={(e) => this._handleClose(e, option)}>
-                            {option}
-                        </MenuItem>
-                    ))}
-                </Menu>
+                <Popper open={open} anchorEl={anchorEl} transition disablePortal>
+                    {({ TransitionProps, placement }) => (
+                        <Grow
+                            {...TransitionProps}
+                            id="long-menu"
+                            style={{ transformOrigin: placement === 'bottom' ? 'left top' : 'left bottom' }}>
+                            <Paper>
+                                <ClickAwayListener onClickAway={this._handleClose}>
+                                    <MenuList>
+                                        {options.map(option => (
+                                            <MenuItem key={option} onClick={(e) => this._handleClose(e, option)}>
+                                                {option}
+                                            </MenuItem>
+                                        ))}
+                                    </MenuList>
+                                </ClickAwayListener>
+                            </Paper>
+                        </Grow>
+                    )}
+                </Popper>
             </Toolbar>
         )
     }
@@ -253,7 +265,7 @@ class App extends Component {
                 <div className={classes.pages}>
                     <Route exact path="/" render={() => (user ? (<Home />) : (<Login />))} />
                     <Route exact path="/favorites" render={() => (user ? (<Favorites />) : (<Login />))} />
-                    <Route exact path="/callback:access_token?" render={() => (user ? (<Redirect to="/" />) : (<Callback  />))} />
+                    <Route exact path="/callback:access_token?" render={() => (user ? (<Redirect to="/" />) : (<Callback />))} />
                 </div>
             </div >
         );

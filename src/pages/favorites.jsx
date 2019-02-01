@@ -34,6 +34,26 @@ class Favorites extends Component {
         if(this.props.user)
             this.props.listFavorites(this.props.user.id);
     }
+
+    _convertMS(millisec) {
+        var seconds = (millisec / 1000).toFixed(0);
+        var minutes = Math.floor(seconds / 60);
+        var hours = "";
+        if (minutes > 59) {
+            hours = Math.floor(minutes / 60);
+            hours = (hours >= 10) ? hours : "0" + hours;
+            minutes = minutes - (hours * 60);
+            minutes = (minutes >= 10) ? minutes : "0" + minutes;
+        }
+
+        seconds = Math.floor(seconds % 60);
+        seconds = (seconds >= 10) ? seconds : "0" + seconds;
+        if (hours != "") {
+            return hours + ":" + minutes + ":" + seconds;
+        }
+        return minutes + ":" + seconds;
+    }
+    
     render() {
         const { classes, user ,favorite_tracks } = this.props;
         return (
