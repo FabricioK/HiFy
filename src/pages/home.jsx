@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux';
-import { playButton, setToken, toogleHover } from '../actions'
+import { playButton, setToken, toogleHover, addFavorite } from '../actions'
 
 import { withStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
@@ -223,7 +223,7 @@ class Home extends Component {
     }
     render() {
         const { classes, playing, artists, albums, tracks, user } = this.props;
-      
+
         return (
             <Paper className={classes.root}>
                 <GridList spacing={30} cellHeight={190} cols={4}>
@@ -304,6 +304,9 @@ class Home extends Component {
                                                     alt={row.name}
                                                     width={50}
                                                 /> : null}
+                                            <Button onClick={() => this.props.addFavorite(user.id, row)}>
+                                                Add this
+                                                </Button>
                                         </TableCell>
                                         <TableCell>
                                             <Typography variant="subtitle1">{row.name}</Typography>
@@ -336,6 +339,6 @@ const mapStateToProps = store => ({
 });
 
 const mapDispatchToProps = dispatch =>
-    bindActionCreators({ playButton, setToken, toogleHover }, dispatch);
+    bindActionCreators({ playButton, setToken, toogleHover, addFavorite }, dispatch);
 
 export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(Home));

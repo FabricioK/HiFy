@@ -4,8 +4,10 @@ import { bindActionCreators } from 'redux';
 
 import { withStyles } from '@material-ui/core/styles';
 import Route from "react-router-dom/Route";
+import withRouter from "react-router-dom/withRouter";
 
 import Avatar from '@material-ui/core/Avatar';
+import { Redirect } from 'react-router-dom'
 
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -30,7 +32,7 @@ import { search, loadUser, logoff } from '../actions'
 import Home from './home';
 import Callback from './callback';
 import Login from './login';
-
+import Favorites from './favorites';
 const styles = theme => ({
     root: {
         backgroundColor: "#0d83af",
@@ -75,8 +77,8 @@ const styles = theme => ({
     },
     chip: {
         margin: theme.spacing.unit / 4,
-        color : "#2196f3",
-        backgroundColor:'white'
+        color: "#2196f3",
+        backgroundColor: 'white'
     },
     noLabel: {
         marginTop: theme.spacing.unit * 3,
@@ -103,7 +105,7 @@ const MenuProps = {
     },
 };
 const types = ['artist', 'album', 'track'];
-const options = ['Favorites', 'Loggout']
+const options = ['Favorites', 'Logout']
 class App extends Component {
     constructor(props) {
         super(props)
@@ -126,10 +128,12 @@ class App extends Component {
 
     _handleClose = (e, option) => {
         this.setState({ anchorEl: null });
-        if ('Loggout' === option)
+        if ('Logout' === option)
             this.props.logoff();
         if ('Favorites' === option)
-            this.props.logoff();
+            this.props.history.push({
+                pathname: '/favorites'
+            });
     };
 
     _search = () => {
@@ -248,7 +252,8 @@ class App extends Component {
                 </AppBar>
                 <div className={classes.pages}>
                     <Route exact path="/" render={() => (user ? (<Home />) : (<Login />))} />
-                    <Route exact path="/callback:access_token?" render={() => (user ? (<Redirect to="/" />) : (<Callback />))} />
+                    <Route exact path="/favorites" render={() => (user ? (<Favorites />) : (<Login />))} />
+                    <Route exact path="/callback:access_token?" render={() => (user ? (<Redirect to="/" />) : (<Callback  />))} />
                 </div>
             </div >
         );
@@ -267,4 +272,4 @@ const mapStateToProps = store => ({
 const mapDispatchToProps = dispatch =>
     bindActionCreators({ search, loadUser, logoff }, dispatch);
 
-export default withStyles(styles, { withTheme: true })(connect(mapStateToProps, mapDispatchToProps)(App));
+export default withRouter(withStyles(styles, { withTheme: true })(connect(mapStateToProps, mapDispatchToProps)(App)));

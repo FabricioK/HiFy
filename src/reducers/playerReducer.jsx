@@ -9,7 +9,8 @@ const initialState = {
     artists: [],
     albums: [],
     tracks: [],
-    error: ''
+    error: '',
+    favorite_tracks: []
 };
 export const playerReducer = (state = initialState, action) => {
     switch (action.type) {
@@ -18,6 +19,17 @@ export const playerReducer = (state = initialState, action) => {
             return {
                 ...state,
                 playing: !playing
+            };
+        case ActionType.LIST_FAVORITES:
+            return {
+                ...state,
+                favorite_tracks: action.payload
+            };
+        case ActionType.LIST_FAVORITES:
+            console.log(action.payload)
+            return {
+                ...state,
+                favorite_tracks: []
             };
         case ActionType.SEARCH_STARTED:
             return {

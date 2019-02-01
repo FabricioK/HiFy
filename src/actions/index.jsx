@@ -1,6 +1,7 @@
 import { ActionType, AuthActionType } from "./actionTypes";
 
 const API = 'https://api.spotify.com/'
+import db from '../db';
 
 export const loadUser = (params) => {
     return (dispatch) => {
@@ -69,6 +70,48 @@ export const search = (params) => {
                     })
                 }
             )
+    }
+}
+
+export const listFavorites = (user_id) => {
+    return (dispatch) => {
+        db.tracks.where('user_id').equals(user_id).toArray().then(
+            (result) => {
+                dispatch({
+                    type: ActionType.LIST_FAVORITES,
+                    payload: result
+                })
+            },
+            (error) => {
+                dispatch({
+                    type: ActionType.LIST_FAVORITES_FAILURE,
+                    payload: error
+                })
+            }
+        )
+    }
+}
+
+export const addFavorite = (user_id, track) => {
+    return (dispatch) => {
+        db.tracks.add({
+            user_id,
+            track_id: track.id,
+            name: track.name
+        }).then(
+            (result) => {
+                dispatch({
+                    type: ActionType.ADDED_FAVORITE,
+                    payload: result
+                })
+            },
+            (error) => {
+                dispatch({
+                    type: ActionType.ADDED_FAVORITE_FAILURE,
+                    payload: error
+                })
+            }
+        )
     }
 }
 

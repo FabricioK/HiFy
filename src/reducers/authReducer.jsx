@@ -2,7 +2,7 @@ import { AuthActionType } from "../actions/actionTypes";
 
 const initialState = {
     token: localStorage.getItem('token'),
-    user: localStorage.getItem('user'),
+    user:  JSON.parse(localStorage.getItem('user')),
     logging: false,
     error: ''
 };
@@ -34,7 +34,8 @@ export const authReducer = (state = initialState, action) => {
                 error: action.payload
             };
         case AuthActionType.USER_AUTH_SUCCESS:
-            localStorage.setItem('user', action.payload);
+            localStorage.setItem('user', JSON.stringify(action.payload));
+            console.log(action.payload);
             return {
                 ...state,
                 logging: false,
