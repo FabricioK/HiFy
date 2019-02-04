@@ -5,9 +5,9 @@ const API = 'https://api.spotify.com/'
 
 
 
-const fetech_albuns = (dispatch, params, artist) => {
+const fetech_tracks = (dispatch, params, album) => {
 
-    fetch(`${API}v1/artists/${params.id}/albums?limit=5`, {
+    fetch(`${API}v1/albums/${params.id}/tracks`, {
         headers: {
             'Authorization': `Bearer ${params.token}`
         }
@@ -20,20 +20,20 @@ const fetech_albuns = (dispatch, params, artist) => {
                         type: AuthActionType.USER_AUTH_FAILURE,
                         payload: response.error.message
                     });
-                let albums = response;
+                let tracks = response;
                 dispatch({
-                    type: ModalActionType.OPEN_ARTIST,
+                    type: ModalActionType.OPEN_ALBUM,
                     payload: {
-                        artist,
-                        albums
+                        album,
+                        tracks
                     }
                 });
             });
 }
 
-export const openArtist = params => {
+export const openAlbum = params => {
     return (dispatch) => {
-        fetch(`${API}v1/artists/${params.id}`, {
+        fetch(`${API}v1/albums/${params.id}`, {
             headers: {
                 'Authorization': `Bearer ${params.token}`
             }
@@ -46,11 +46,11 @@ export const openArtist = params => {
                             type: AuthActionType.USER_AUTH_FAILURE,
                             payload: response.error.message
                         });
-                    fetech_albuns(dispatch, params, response);
+                    fetech_tracks(dispatch, params, response);
                 },
                 (error) => {
                     dispatch({
-                        type: AuthActionType.OPEN_ARTIST_ERROR,
+                        type: ModalActionType.OPEN_ALBUM_ERROR,
                         payload: error
                     })
                 }
@@ -58,15 +58,6 @@ export const openArtist = params => {
     }
 };
 
-export const closeArtist = () => ({
-    type: ModalActionType.CLOSE_ARTIST
-});
-
-export const toogleHoverON = (item, type) => ({
-    type: ModalActionType.HOVER_ARTIST_ON,
-    payload: { item, type }
-});
-export const toogleHoverOFF = (item, type) => ({
-    type: ModalActionType.HOVER_ARTIST_OFF,
-    payload: { item, type }
+export const closeAlbum = () => ({
+    type: ModalActionType.CLOSE_ALBUM
 });

@@ -23,7 +23,7 @@ export const trackReducer = (state = initialState, action) => {
             return {
                 ...state,
                 favorite_tracks: []
-            };
+            };        
         default:
             return state;
     }

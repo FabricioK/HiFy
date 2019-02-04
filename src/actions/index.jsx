@@ -86,8 +86,12 @@ export const logoff = () => ({
     type: AuthActionType.LOGOFF
 });
 
-export const toogleHover = (item, type) => ({
-    type: ActionType.HOVER,
+export const toogleHoverON = (item, type) => ({
+    type: ActionType.HOVER_ON,
+    payload: { item, type }
+});
+export const toogleHoverOFF = (item, type) => ({
+    type: ActionType.HOVER_OFF,
     payload: { item, type }
 });
 

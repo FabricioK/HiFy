@@ -1,7 +1,7 @@
 import { ActionType } from "../actions/actionTypes";
 import orderBy from 'lodash/orderBy';
 import groupBy from 'lodash/groupBy';
-
+import db from '../db';
 const initialState = {
     playing: false,
     searching: false,
@@ -37,21 +37,28 @@ export const playerReducer = (state = initialState, action) => {
             return {
                 ...state,
                 playing: !playing
-            };        
+            };
         case ActionType.SEARCH_STARTED:
             return {
                 ...state,
                 searching: true,
                 error: '',
-                artists: []
+                artists: [],
+                albums: [],
+                tracks: []
             };
-            
+
         case ActionType.SEARCH_SUCCESS:
             const result = action.payload
-            let artists = [];
-            let albums = [];
-            let tracks = [];
+            var artists = [];
+            var albums = [];
+            var tracks = [];
 
+            var f_tracks = [];
+            var t_favorites = db.tracks.toArray((i) => {
+                f_tracks.push(i);
+            });
+            console.log(f_tracks)
             //ARTISTS
             if (result.artists && result.artists.items) {
                 const payload = orderBy(result.artists.items, ['popularity', 'images'], ['desc'])
@@ -79,16 +86,16 @@ export const playerReducer = (state = initialState, action) => {
             //ALBUMS
             if (result.albums && result.albums.items) {
                 const payload = orderBy(result.albums.items, ['release_date'], ['desc'])
-                .map((album) => {
-                    return {
-                        artist_id: album.id,
-                        name: album.name,
-                        image: album.images && album.images.length > 0 ? album.images[0].url : null,
-                        hover: false,
-                        external_urls: album.external_urls.spotify,
-                        artists: album.artists.length > 1 ? 'Various artists' : album.artists[0].name
-                    }
-                });
+                    .map((album) => {
+                        return {
+                            album_id: album.id,
+                            name: album.name,
+                            image: album.images && album.images.length > 0 ? album.images[0].url : null,
+                            hover: false,
+                            external_urls: album.external_urls.spotify,
+                            artists: album.artists.length > 1 ? 'Various artists' : album.artists[0].name
+                        }
+                    });
                 if (payload.length > 0) {
                     let index = 0;
                     const miniaba = groupBy(payload, () => {
@@ -127,19 +134,20 @@ export const playerReducer = (state = initialState, action) => {
                 searching: false,
                 error: action.payload
             };
-        case ActionType.HOVER:
-            let t_artists = state.artists;
-            let t_albums = state.albums;
+        case ActionType.HOVER_ON:
+            var t_artists = state.artists;
+            var t_albums = state.albums;
+            var hover_value = true;
             //hover over artist
             if (action.payload.type == 'artists')
                 t_artists = t_artists.map(item => {
                     return (item.childs ?
                         {
                             childs: item.childs.map(child => {
-                                return child == action.payload.item ? { ...child, hover: !child.hover } : child
+                                return child == action.payload.item ? { ...child, hover: hover_value } : child
                             })
                         } :
-                        item == action.payload.item ? { ...item, hover: !item.hover } : item)
+                        item == action.payload.item ? { ...item, hover: hover_value } : item)
                 });
             //hover over album
             if (action.payload.type == 'albums')
@@ -147,10 +155,41 @@ export const playerReducer = (state = initialState, action) => {
                     return (item.childs ?
                         {
                             childs: item.childs.map(child => {
-                                return child == action.payload.item ? { ...child, hover: !child.hover } : child
+                                return child == action.payload.item ? { ...child, hover: hover_value } : child
                             })
                         } :
-                        item == action.payload.item ? { ...item, hover: !item.hover } : item)
+                        item == action.payload.item ? { ...item, hover: hover_value } : item)
+                });
+            return {
+                ...state,
+                artists: t_artists,
+                albums: t_albums
+            }
+        case ActionType.HOVER_OFF:
+            var t_artists = state.artists;
+            var t_albums = state.albums;
+            var hover_value = false;
+            //hover over artist
+            if (action.payload.type == 'artists')
+                t_artists = t_artists.map(item => {
+                    return (item.childs ?
+                        {
+                            childs: item.childs.map(child => {
+                                return child == action.payload.item ? { ...child, hover: hover_value } : child
+                            })
+                        } :
+                        item == action.payload.item ? { ...item, hover: hover_value } : item)
+                });
+            //hover over album
+            if (action.payload.type == 'albums')
+                t_albums = t_albums.map(item => {
+                    return (item.childs ?
+                        {
+                            childs: item.childs.map(child => {
+                                return child == action.payload.item ? { ...child, hover: hover_value } : child
+                            })
+                        } :
+                        item == action.payload.item ? { ...item, hover: hover_value } : item)
                 });
             return {
                 ...state,

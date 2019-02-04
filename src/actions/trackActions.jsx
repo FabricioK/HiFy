@@ -11,7 +11,7 @@ export const listFavorites = (user_id) => {
                     payload: result
                 })
             },
-            (error) => {              
+            (error) => {
                 dispatch({
                     type: ActionType.LIST_FAVORITES_FAILURE,
                     payload: error

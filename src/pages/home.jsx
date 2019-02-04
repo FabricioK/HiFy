@@ -1,7 +1,9 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux';
-import { playButton, setToken, toogleHover } from '../actions';
+import { setToken, toogleHoverON, toogleHoverOFF } from '../actions';
+import { openArtist } from '../actions/artistActions'
+import { openAlbum } from '../actions/albumActions'
 import { addFavorite } from '../actions/trackActions';
 import { withRouter } from "react-router";
 
@@ -13,6 +15,8 @@ import GridListTile from '@material-ui/core/GridListTile';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpotify } from '@fortawesome/free-brands-svg-icons/faSpotify';
+import { faStar } from '@fortawesome/free-regular-svg-icons/faStar';
+import { faStar as faStarSolid } from '@fortawesome/free-solid-svg-icons/faStar';
 
 import Typography from '@material-ui/core/Typography';
 
@@ -28,7 +32,10 @@ import Dialog from '@material-ui/core/Dialog';
 import { _GridItemAlbum } from '../components/gridItemAlbum';
 import { _GridItemArtist } from '../components/gridItemArtist';
 
-import Artist from './artist'
+import Artist from './artist';
+import Album from './album';
+
+
 const styles = theme => ({
     root: {
         backgroundColor: '#f6f6f6',
@@ -99,15 +106,21 @@ class Home extends Component {
     }
 
     _hoverOn = (e, t) => {
-        this.props.toogleHover(e, t)
+        this.props.toogleHoverON(e, t)
     }
     _hoverOff = (e, t) => {
-        this.props.toogleHover(e, t)
-    }   
-    
+        this.props.toogleHoverOFF(e, t)
+    }
+    _openDialog = (id) => {
+        this.props.openArtist({ id, token: this.props.token })
+    }
+
+    _openDialogAlbum = (id) => {
+        this.props.openAlbum({ id, token: this.props.token })
+    }
 
     render() {
-        const { classes, playing, artists, albums, tracks, user } = this.props;
+        const { classes, artistView, artists, albums, tracks, user, albumView } = this.props;
 
         return (
             <Paper className={classes.root}>
@@ -131,11 +144,11 @@ class Home extends Component {
                                             className={classes.nomargin}>
                                             {item.childs && item.childs
                                                 .map((child, child_index) => {
-                                                    return _GridItemArtist(classes, child, child_index, true)
+                                                    return _GridItemArtist(classes, child, child_index, true, this._hoverOn, this._hoverOff, this._openDialog)
                                                 })}
                                         </GridList>
                                     </GridListTile>)
-                            return _GridItemArtist(classes, item, index, false)
+                            return _GridItemArtist(classes, item, index, false, this._hoverOn, this._hoverOff, this._openDialog)
                         })
                     }
                     {albums && albums.length > 0 ?
@@ -157,11 +170,11 @@ class Home extends Component {
                                             className={classes.nomargin}>
                                             {item.childs && item.childs
                                                 .map((child, child_index) => {
-                                                    return _GridItemAlbum(classes, child, child_index, true)
+                                                    return _GridItemAlbum(classes, child, child_index, true, this._hoverOn, this._hoverOff, this._openDialogAlbum)
                                                 })}
                                         </GridList>
                                     </GridListTile>)
-                            return _GridItemAlbum(classes, item, index, false)
+                            return _GridItemAlbum(classes, item, index, false, this._hoverOn, this._hoverOff, this._openDialogAlbum)
 
                         })
                     }
@@ -183,7 +196,9 @@ class Home extends Component {
                                 {tracks.map((row, index) => (
                                     <TableRow key={`track_${index}`}>
                                         <TableCell component="th" scope="row">
-                                            <Button onClick={() => this.props.addFavorite(user.id, row)}> Add this </Button>
+                                            <Button onClick={() => this.props.addFavorite(user.id, row)}>
+                                                <FontAwesomeIcon size="2x" icon={faStarSolid} color="yellow" />
+                                            </Button>
                                             {row.album_images ?
                                                 <img
                                                     src={row.album_images}
@@ -212,18 +227,27 @@ class Home extends Component {
                     : null}
                 <Dialog
                     fullScreen
-                    open={false}
-                    onClose={this.handleClose}
+                    open={artistView}
+                    onClose={this.props.closeArtist}
                     TransitionComponent={this.Transition}
                 >
                     <Artist />
+                </Dialog>
+                <Dialog
+                    fullScreen
+                    open={albumView}
+                    onClose={this.props.closeArtist}
+                    TransitionComponent={this.Transition}
+                >
+                    <Album />
                 </Dialog>
             </Paper >
         )
     }
 }
 const mapStateToProps = store => ({
-    playing: store.playerState.playing,
+    artistView: store.artistState.artistView,
+    albumView: store.albumState.albumView,
     error: store.playerState.error,
     artists: store.playerState.artists,
     albums: store.playerState.albums,
@@ -233,6 +257,6 @@ const mapStateToProps = store => ({
 });
 
 const mapDispatchToProps = dispatch =>
-    bindActionCreators({ playButton, setToken, toogleHover, addFavorite }, dispatch);
+    bindActionCreators({ setToken, toogleHoverON, toogleHoverOFF, addFavorite, openArtist, openAlbum }, dispatch);
 
 export default withRouter(withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(Home)));

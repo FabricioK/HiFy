@@ -1,27 +1,33 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux';
-import { search } from '../actions/artistActions'
-import { withRouter } from "react-router";
+import { closeArtist, addFavorite, toogleHoverON, toogleHoverOFF } from '../actions/artistActions'
 
-import Button from '@material-ui/core/Button';
-import Paper from '@material-ui/core/Paper';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
+import CloseIcon from '@material-ui/icons/Close';
+
+import Paper from '@material-ui/core/Paper';
+
+import GridList from '@material-ui/core/GridList';
+import GridListTile from '@material-ui/core/GridListTile';
+import ListSubheader from '@material-ui/core/ListSubheader';
+
 import withStyles from '@material-ui/core/styles/withStyles';
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSpotify } from '@fortawesome/free-brands-svg-icons/faSpotify';
+import { _GridItemAlbum } from '../components/gridItemAlbum';
+import { _GridItemArtist } from '../components/gridItemArtist';
 
-import db from '../db';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-
-const styles = theme => ({
-
-});
+const styles = {
+    appBar: {
+        position: 'relative',
+    },
+    flex: {
+        flex: 1,
+    },
+};
 
 
 class Artist extends Component {
@@ -32,79 +38,68 @@ class Artist extends Component {
         }
     }
 
-    _loadArtist = () => {
-        const { access_token } = qs.parse(this.props.location.hash);
-        if (access_token)
-            this.props.search(this.props.user.id);
+    _hoverOn = (e, t) => {
+        this.props.toogleHoverON(e, t)
     }
-
-    _afterDeleteHook = (pk, ob, trans) => {
-        trans.on("complete", this._loadArtist);
-    }
-
-    componentWillMount() {
-        db.tracks.hook('deleting', this._afterDeleteHook)
-        this._loadArtist();
-    }
-
-    componentWillUnmount() {
-        db.tracks.hook('deleting').unsubscribe(this._afterDeleteHook)
+    _hoverOff = (e, t) => {
+        this.props.toogleHoverOFF(e, t)
     }
 
     render() {
-        const { classes, user, favorite_tracks } = this.props;
-        return (
-            <Paper className={classes.root}>
-                {favorite_tracks && favorite_tracks.length > 0 ?
-                    <div className={classes.tracksArea}>
-                        <Typography variant="h4" color="primary">Tracks</Typography>
-                        <Table className={classes.grow}>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell ></TableCell>
-                                    <TableCell >Track</TableCell>
-                                    <TableCell >Album</TableCell>
-                                    <TableCell >Duration</TableCell>
-                                    <TableCell></TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {favorite_tracks.map((row, index) => (
-                                    <TableRow key={`track_${index}`}>
-                                        <TableCell component="th" scope="row">
-                                            {row.album && row.album.images[0] ?
-                                                <img
-                                                    src={row.album.images[0].url}
-                                                    alt={row.name}
-                                                    width={50}
-                                                /> : null}
-                                            <Button onClick={() => this.props.unfavorite(row.id)}>
-                                                Remove
-                                                </Button>
-                                        </TableCell>
-                                        <TableCell>
-                                            <Typography variant="subtitle1">{row.name}</Typography>
-                                        </TableCell>
-                                        <TableCell>{row.album}</TableCell>
-                                        <TableCell align="right"></TableCell>
-                                        <TableCell align="right">
+        const { classes, closeArtist, artist, albums } = this.props;
 
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </div>
-                    : null}
-            </Paper>
-        );
+        return (artist == null ? <div></div> :
+            <Paper className={classes.flex} >
+                <AppBar className={classes.appBar}>
+                    <Toolbar>
+                        <IconButton color="inherit" onClick={closeArtist} aria-label="Close">
+                            <CloseIcon />
+                        </IconButton>
+                        <Typography variant="h6" color="inherit" className={classes.flex}>
+                            {artist.name}
+                        </Typography>
+                    </Toolbar>
+                </AppBar>
+                <GridList spacing={30} cellHeight={190} cols={4}>
+                    {albums && albums.length > 0 ?
+                        <GridListTile key="Subheader_Albums" cols={4} style={{ height: 'auto' }}>
+                            <ListSubheader component="div"><Typography variant="h4" color="primary">Albums</Typography></ListSubheader>
+                        </GridListTile> : null
+                    }
+                    {albums && albums
+                        .map((item, index) => {
+                            if (item.childs)
+                                return (
+                                    <GridListTile
+                                        key={index}
+                                        cols={2}
+                                        rows={2}
+                                        className={classes.nomargin}>
+                                        <GridList
+                                            spacing={30} cellHeight={160}
+                                            className={classes.nomargin}>
+                                            {item.childs && item.childs
+                                                .map((child, child_index) => {
+                                                    return _GridItemAlbum(classes, child, child_index, true, this._hoverOn, this._hoverOff)
+                                                })}
+                                        </GridList>
+                                    </GridListTile>)
+                            return _GridItemAlbum(classes, item, index, false, this._hoverOn, this._hoverOff)
+
+                        })
+                    }
+                </GridList>
+            </Paper>)
+
     }
 }
 const mapStateToProps = store => ({
-    user: store.authState.user
+    user: store.authState.user,
+    artist: store.artistState.artistModal,
+    albums: store.artistState.albumsModal
 });
 
 const mapDispatchToProps = dispatch =>
-    bindActionCreators({ search }, dispatch);
+    bindActionCreators({ closeArtist, addFavorite, toogleHoverON, toogleHoverOFF }, dispatch);
 
-export default withRouter(withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(Artist)));
+export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(Artist));

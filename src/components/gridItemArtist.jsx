@@ -3,11 +3,15 @@ import { _popularity } from './gridItemHelper'
 import Grow from '@material-ui/core/Grow';
 import Collapse from '@material-ui/core/Collapse';
 import Paper from '@material-ui/core/Paper';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSpotify } from '@fortawesome/free-brands-svg-icons/faSpotify';
 
 import GridListTile from '@material-ui/core/GridListTile';
 import GridListTileBar from '@material-ui/core/GridListTileBar';
+import ListSubheader from '@material-ui/core/ListSubheader';
+import Button from '@material-ui/core/Button';
 
-export const _GridItemArtist = (classes, item, index, is_child) => {
+export const _GridItemArtist = (classes, item, index, is_child, _hoverOn, _hoverOff, _openDialog) => {
     let pop = _popularity(is_child, index, item.popularity);
     return <Grow
         in={true}
@@ -16,16 +20,12 @@ export const _GridItemArtist = (classes, item, index, is_child) => {
         cols={pop.cols || 1}
         rows={pop.rows || 1}>
         <GridListTile
-            onMouseEnter={() => this._hoverOn(item, 'artists')}
-            onMouseLeave={() => this._hoverOff(item, 'artists')}
+            onMouseEnter={() => _hoverOn(item, 'artists')}
+            onMouseLeave={() => _hoverOff(item, 'artists')}
             className={item.hover == true ? classes.tileHover : classes.tile}>
             {item.image ?
                 <img
-                    onClick={() => {
-                        this.props.history.push({
-                            pathname: `/artist/${item.artist_id}`
-                        });
-                    }}
+                    onClick={() => _openDialog(item.artist_id)}
                     src={item.image}
                     alt={item.name}
                 /> : null}
@@ -51,11 +51,7 @@ export const _GridItemArtist = (classes, item, index, is_child) => {
                 className={classes.titleBarTop}
             />
             <GridListTileBar
-                onClick={() => {
-                    this.props.history.push({
-                        pathname: `/artist/${item.artist_id}`
-                    });
-                }}
+                onClick={() => _openDialog(item.artist_id)}
                 title={item.name}
                 subtitle={item.genres}
                 actionPosition="left"
