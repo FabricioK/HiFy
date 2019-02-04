@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux';
-import { listFavorites, unfavorite } from '../actions/trackActions'
+import { search } from '../actions/artistActions'
+import { withRouter } from "react-router";
 
 import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
@@ -19,65 +20,11 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 
 const styles = theme => ({
-    root: {
-        backgroundColor: '#f6f6f6',
-        width: '80vw',
-        marginTop: '20vh',
-        minHeight: '70vh',
-        height: '100%',
-        padding: theme.spacing.unit * 2,
-        borderRadius: '15px 15px 0 0'
-    },
-    image: {
-        width: 128,
-        height: 128,
-    },
-    img: {
-        margin: 'auto',
-        display: 'block',
-        maxWidth: '100%',
-        maxHeight: '100%',
-    },
-    titleBar: {
-        background:
-            'linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, ' +
-            'rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)',
-    },
-    titleBarTop: {
-        background: 'none'
-    },
-    tile: {
 
-    },
-    tileHover: {
-        cursor: 'pointer',
-        boxShadow: '5px 5px 1px grey',
-        padding: '0px !important'
-    },
-    icon: {
-        color: 'white',
-    },
-    nomargin: {
-        margin: '0px !important'
-    },
-    flex: {
-        display: "flex",
-        flexDirection: "row",
-        width: '100%',
-        alignItems: 'center',
-        justifyContent: 'space-around'
-    },
-    grow: {
-        flexGrow: 1,
-        width: '100%'
-    }, tracksArea: {
-        marginTop: 20
-    }
 });
 
 
-
-class Favorites extends Component {
+class Artist extends Component {
     constructor(props) {
         super(props)
         this.state = {
@@ -85,39 +32,23 @@ class Favorites extends Component {
         }
     }
 
-    _loadList = () => {
-        if (this.props.user)
-            this.props.listFavorites(this.props.user.id);
+    _loadArtist = () => {
+        const { access_token } = qs.parse(this.props.location.hash);
+        if (access_token)
+            this.props.search(this.props.user.id);
     }
 
-    _afterDeleteHook = (pk,ob,trans) => {
-        trans.on("complete" ,this._loadList);
+    _afterDeleteHook = (pk, ob, trans) => {
+        trans.on("complete", this._loadArtist);
     }
 
     componentWillMount() {
         db.tracks.hook('deleting', this._afterDeleteHook)
-        this._loadList();
+        this._loadArtist();
     }
+
     componentWillUnmount() {
         db.tracks.hook('deleting').unsubscribe(this._afterDeleteHook)
-    }
-    _convertMS(millisec) {
-        var seconds = (millisec / 1000).toFixed(0);
-        var minutes = Math.floor(seconds / 60);
-        var hours = "";
-        if (minutes > 59) {
-            hours = Math.floor(minutes / 60);
-            hours = (hours >= 10) ? hours : "0" + hours;
-            minutes = minutes - (hours * 60);
-            minutes = (minutes >= 10) ? minutes : "0" + minutes;
-        }
-
-        seconds = Math.floor(seconds % 60);
-        seconds = (seconds >= 10) ? seconds : "0" + seconds;
-        if (hours != "") {
-            return hours + ":" + minutes + ":" + seconds;
-        }
-        return minutes + ":" + seconds;
     }
 
     render() {
@@ -170,11 +101,10 @@ class Favorites extends Component {
     }
 }
 const mapStateToProps = store => ({
-    favorite_tracks: store.trackState.favorite_tracks,
     user: store.authState.user
 });
 
 const mapDispatchToProps = dispatch =>
-    bindActionCreators({ listFavorites, unfavorite }, dispatch);
+    bindActionCreators({ search }, dispatch);
 
-export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(Favorites));
+export default withRouter(withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(Artist)));

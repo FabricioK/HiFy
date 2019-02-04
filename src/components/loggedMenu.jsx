@@ -22,16 +22,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckSquare } from '@fortawesome/free-regular-svg-icons/faCheckSquare';
 import { faSquare } from '@fortawesome/free-regular-svg-icons/faSquare';
 
-
-const _getStyles = (name, that) => {
-    return {
-        fontWeight:
-            that.state.types.indexOf(name) === -1
-                ? that.props.theme.typography.fontWeightRegular
-                : that.props.theme.typography.fontWeightMedium,
-    };
-}
-
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {

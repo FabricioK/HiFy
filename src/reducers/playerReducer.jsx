@@ -1,7 +1,6 @@
 import { ActionType } from "../actions/actionTypes";
 import orderBy from 'lodash/orderBy';
 import groupBy from 'lodash/groupBy';
-import without from 'lodash/without';
 
 const initialState = {
     playing: false,
@@ -9,8 +8,7 @@ const initialState = {
     artists: [],
     albums: [],
     tracks: [],
-    error: '',
-    favorite_tracks: []
+    error: ''
 };
 
 const _convertMS = (millisec) => {
@@ -39,18 +37,7 @@ export const playerReducer = (state = initialState, action) => {
             return {
                 ...state,
                 playing: !playing
-            };
-        case ActionType.LIST_FAVORITES:
-            return {
-                ...state,
-                favorite_tracks: action.payload
-            };
-        case ActionType.LIST_FAVORITES:
-            console.log(action.payload)
-            return {
-                ...state,
-                favorite_tracks: []
-            };
+            };        
         case ActionType.SEARCH_STARTED:
             return {
                 ...state,
@@ -58,6 +45,7 @@ export const playerReducer = (state = initialState, action) => {
                 error: '',
                 artists: []
             };
+            
         case ActionType.SEARCH_SUCCESS:
             const result = action.payload
             let artists = [];

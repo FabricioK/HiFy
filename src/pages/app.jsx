@@ -19,7 +19,7 @@ import Callback from './callback';
 import Login from './login';
 import Favorites from './favorites';
 
-import {_loggedMenu} from '../components/loggedMenu';
+import { _loggedMenu } from '../components/loggedMenu';
 
 const styles = theme => ({
     root: {
@@ -93,7 +93,7 @@ class App extends Component {
         super(props)
         this.state = {
             query: '',
-            types: ['track'],
+            types: ['artist'],
             anchorEl: null,
         }
     }
@@ -120,7 +120,10 @@ class App extends Component {
 
     _search = () => {
         if (this.state.types.length > 0)
-            this.props.search({ token: this.props.token, query: this.state.query, type: this.state.types.join(','), limit: 20, offset: 0 })
+            this.props.search({ token: this.props.token, query: this.state.query, type: this.state.types.join(','), limit: 20, offset: 0 });
+        this.props.history.push({
+            pathname: '/'
+        });
     }
 
     _updateQuery = (event) => {
@@ -133,7 +136,7 @@ class App extends Component {
         if (e.key === 'Enter') {
             this._search()
         }
-    }    
+    }
 
     render() {
         const { classes, error, searching, user } = this.props;
@@ -141,7 +144,7 @@ class App extends Component {
             <div className={classes.root}>
                 <AppBar position="absolute">
                     {user ?
-                        _loggedMenu(classes, user,this.state.anchorEl,this.state.types,this._handleChange,this._handleClick,this._handleKeyPress,this._updateQuery,this._search,this._handleClose) : null}
+                        _loggedMenu(classes, user, this.state.anchorEl, this.state.types, this._handleChange, this._handleClick, this._handleKeyPress, this._updateQuery, this._search, this._handleClose) : null}
                     <div className={classes.grow}>
                         {searching ? <LinearProgress /> : null}
                     </div>

@@ -1,24 +1,19 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux';
-import { playButton, setToken, toogleHover, addFavorite } from '../actions'
+import { playButton, setToken, toogleHover } from '../actions';
+import { addFavorite } from '../actions/trackActions';
+import { withRouter } from "react-router";
 
 import { withStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
-import GridListTileBar from '@material-ui/core/GridListTileBar';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpotify } from '@fortawesome/free-brands-svg-icons/faSpotify';
-import { faPepperHot } from '@fortawesome/free-solid-svg-icons/faPepperHot';
-import { faUserNinja } from '@fortawesome/free-solid-svg-icons/faUserNinja';
-import { faHeart } from '@fortawesome/free-solid-svg-icons/faHeart';
-import { faSmile } from '@fortawesome/free-solid-svg-icons/faSmile';
 
-import Grow from '@material-ui/core/Grow';
-import Collapse from '@material-ui/core/Collapse';
 import Typography from '@material-ui/core/Typography';
 
 import Table from '@material-ui/core/Table';
@@ -27,6 +22,13 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 
+import Slide from '@material-ui/core/Slide';
+
+import Dialog from '@material-ui/core/Dialog';
+import { _GridItemAlbum } from '../components/gridItemAlbum';
+import { _GridItemArtist } from '../components/gridItemArtist';
+
+import Artist from './artist'
 const styles = theme => ({
     root: {
         backgroundColor: '#f6f6f6',
@@ -59,6 +61,7 @@ const styles = theme => ({
 
     },
     tileHover: {
+        cursor: 'pointer',
         boxShadow: '5px 5px 1px grey',
         padding: '0px !important'
     },
@@ -91,117 +94,17 @@ class Home extends Component {
             query: ''
         }
     }
+    Transition = (props) => {
+        return <Slide direction="up" {...props} />;
+    }
+
     _hoverOn = (e, t) => {
         this.props.toogleHover(e, t)
     }
     _hoverOff = (e, t) => {
         this.props.toogleHover(e, t)
-    }
-    _popularity(is_child, index, pop) {
-        let tag = {
-            text: "HOT", icon: <FontAwesomeIcon icon={faPepperHot} />
-        };;
-        if (pop >= 60 && pop <= 79)
-            tag = { text: 'Cool', icon: <FontAwesomeIcon icon={faHeart} /> };
-        if (pop >= 30 && pop <= 59)
-            tag = { text: 'Regular', icon: <FontAwesomeIcon icon={faSmile} /> };
-        if (pop <= 30)
-            tag = { text: 'Underground', icon: <FontAwesomeIcon icon={faUserNinja} /> };
-
-        return (index == 0 && !is_child) ?
-            { cols: 2, rows: 2, tag } : { cols: 1, rows: 1, tag }
-    }
-    _GridItemArtist = (classes, item, index, is_child) => {
-        let pop = this._popularity(is_child, index, item.popularity);
-        return <Grow
-            in={true}
-            {...({ timeout: 1000 + (100 * index) })}
-            key={`artists_${index}`}
-            cols={pop.cols || 1}
-            rows={pop.rows || 1}>
-            <GridListTile
-                onMouseEnter={() => this._hoverOn(item, 'artists')}
-                onMouseLeave={() => this._hoverOff(item, 'artists')}
-                className={item.hover == true ? classes.tileHover : classes.tile}>
-                {item.image ?
-                    <img
-                        src={item.image}
-                        alt={item.name}
-                    /> : null}
-
-                <GridListTileBar
-                    className={classes.nomargin}
-                    titlePosition="top"
-                    title={
-                        <Collapse in={item.hover == true} className={classes.nomargin}>
-                            <Paper className={classes.nomargin}>
-                                <ListSubheader className={classes.flex} component="div">
-                                    <div>
-                                        {pop.tag.text}  {pop.tag.icon}
-                                    </div>
-                                    <Button target="_blank" href={item.external_urls}>
-                                        <FontAwesomeIcon size="2x" icon={faSpotify} color="#1DB954" />
-                                    </Button>
-                                </ListSubheader>
-                            </Paper>
-                        </Collapse>
-                    }
-                    actionPosition="left"
-                    className={classes.titleBarTop}
-                />
-                <GridListTileBar
-                    title={item.name}
-                    subtitle={item.genres}
-                    actionPosition="left"
-                    className={classes.titleBar}
-                />
-            </GridListTile>
-        </Grow>
-    }
-    _GridItemAlbum = (classes, item, index, is_child) => {
-        let pop = this._popularity(is_child, index, item.popularity);
-        return <Grow
-            in={true}
-            {...({ timeout: 1000 + (100 * index) })}
-            key={`albums_${index}`}
-            cols={pop.cols || 1}
-            rows={pop.rows || 1}>
-            <GridListTile
-                onMouseEnter={() => this._hoverOn(item, 'albums')}
-                onMouseLeave={() => this._hoverOff(item, 'albums')}
-                className={item.hover == true ? classes.tileHover : classes.tile}>
-                {item.image ?
-                    <img
-                        src={item.image}
-                        alt={item.name}
-                    /> : null}
-
-                <GridListTileBar
-                    className={classes.nomargin}
-                    titlePosition="top"
-                    title={
-                        <Collapse in={item.hover == true} className={classes.nomargin}>
-                            <Paper className={classes.nomargin}>
-                                <ListSubheader className={classes.flex} component="div">
-                                    <Button target="_blank" href={item.external_urls}>
-                                        <FontAwesomeIcon size="2x" icon={faSpotify} color="#1DB954" />
-                                    </Button>
-                                </ListSubheader>
-                            </Paper>
-                        </Collapse>
-                    }
-                    actionPosition="left"
-                    className={classes.titleBarTop}
-                />
-                <GridListTileBar
-                    title={item.name}
-                    subtitle={item.artists}
-                    actionPosition="left"
-                    className={classes.titleBar}
-                />
-            </GridListTile>
-        </Grow>
-    }
+    }   
+    
 
     render() {
         const { classes, playing, artists, albums, tracks, user } = this.props;
@@ -228,11 +131,11 @@ class Home extends Component {
                                             className={classes.nomargin}>
                                             {item.childs && item.childs
                                                 .map((child, child_index) => {
-                                                    return this._GridItemArtist(classes, child, child_index, true)
+                                                    return _GridItemArtist(classes, child, child_index, true)
                                                 })}
                                         </GridList>
                                     </GridListTile>)
-                            return this._GridItemArtist(classes, item, index, false)
+                            return _GridItemArtist(classes, item, index, false)
                         })
                     }
                     {albums && albums.length > 0 ?
@@ -254,11 +157,11 @@ class Home extends Component {
                                             className={classes.nomargin}>
                                             {item.childs && item.childs
                                                 .map((child, child_index) => {
-                                                    return this._GridItemAlbum(classes, child, child_index, true)
+                                                    return _GridItemAlbum(classes, child, child_index, true)
                                                 })}
                                         </GridList>
                                     </GridListTile>)
-                            return this._GridItemAlbum(classes, item, index, false)
+                            return _GridItemAlbum(classes, item, index, false)
 
                         })
                     }
@@ -307,6 +210,14 @@ class Home extends Component {
                         </Table>
                     </div>
                     : null}
+                <Dialog
+                    fullScreen
+                    open={false}
+                    onClose={this.handleClose}
+                    TransitionComponent={this.Transition}
+                >
+                    <Artist />
+                </Dialog>
             </Paper >
         )
     }
@@ -324,4 +235,4 @@ const mapStateToProps = store => ({
 const mapDispatchToProps = dispatch =>
     bindActionCreators({ playButton, setToken, toogleHover, addFavorite }, dispatch);
 
-export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(Home));
+export default withRouter(withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(Home)));
