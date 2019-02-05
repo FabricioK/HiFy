@@ -79,7 +79,7 @@ export const addFavorite = (user_id, track, type) => {
                     user_id,
                     album_id: track.album_id,
                     name: track.name,
-                    image: track.images,
+                    image: track.image,
                     favorite: true,
                     hover: false,
                     external_urls: track.external_urls,
@@ -110,11 +110,8 @@ export const addFavorite = (user_id, track, type) => {
                     artist_id: track.artist_id,
                     name: track.name,
                     favorite: true,
-                    album_name: track.album_name,
-                    artists_name: track.artists_name,
-                    album_images: track.album_images,
-                    external_urls: track.external_urls,
-                    duration_ms: track.duration_ms
+                    image: track.image,
+                    external_urls: track.external_urls
                 }).then(
                     (result) => {
                         dispatch({

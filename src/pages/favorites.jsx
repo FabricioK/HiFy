@@ -90,8 +90,8 @@ class Favorites extends Component {
             this.props.listFavorites(this.props.user.id);
     }
 
-    _afterDeleteHook = (pk,ob,trans) => {
-        trans.on("complete" ,this._loadList);
+    _afterDeleteHook = (pk, ob, trans) => {
+        trans.on("complete", this._loadList);
     }
 
     componentWillMount() {
@@ -125,15 +125,16 @@ class Favorites extends Component {
     }
 
     render() {
-        const { classes, user, favorite_tracks,favorite_artists,favorite_albums } = this.props;
+        const { classes, user, favorite_tracks, favorite_artists, favorite_albums } = this.props;
         return (
             <Paper className={classes.root}>
-            {favorite_artists && favorite_artists.length > 0 ?
+                {favorite_artists && favorite_artists.length > 0 ?
                     <div className={classes.tracksArea}>
                         <Typography variant="h4" color="primary">Artists</Typography>
                         <Table className={classes.grow}>
                             <TableHead>
                                 <TableRow>
+                                    <TableCell ></TableCell>
                                     <TableCell ></TableCell>
                                     <TableCell >Artist</TableCell>
                                     <TableCell >Album</TableCell>
@@ -144,16 +145,16 @@ class Favorites extends Component {
                             <TableBody>
                                 {favorite_artists.map((row, index) => (
                                     <TableRow key={`track_${index}`}>
+                                        <TableCell>
+                                            <Button onClick={() => this.props.unfavorite(row.id, 'artist')}>Remove</Button>
+                                        </TableCell>
                                         <TableCell component="th" scope="row">
-                                            {row.album && row.album.images[0] ?
+                                            {row.image ?
                                                 <img
-                                                    src={row.album.images[0].url}
+                                                    src={row.image}
                                                     alt={row.name}
                                                     width={50}
                                                 /> : null}
-                                            <Button onClick={() => this.props.unfavorite(row.id,'artist')}>
-                                                Remove
-                                                </Button>
                                         </TableCell>
                                         <TableCell>
                                             <Typography variant="subtitle1">{row.name}</Typography>
@@ -169,12 +170,13 @@ class Favorites extends Component {
                         </Table>
                     </div>
                     : null}
-                    {favorite_albums && favorite_albums.length > 0 ?
+                {favorite_albums && favorite_albums.length > 0 ?
                     <div className={classes.tracksArea}>
                         <Typography variant="h4" color="primary">Albums</Typography>
                         <Table className={classes.grow}>
                             <TableHead>
                                 <TableRow>
+                                    <TableCell ></TableCell>
                                     <TableCell ></TableCell>
                                     <TableCell >Track</TableCell>
                                     <TableCell >Album</TableCell>
@@ -185,16 +187,16 @@ class Favorites extends Component {
                             <TableBody>
                                 {favorite_albums.map((row, index) => (
                                     <TableRow key={`track_${index}`}>
+                                        <TableCell>
+                                            <Button onClick={() => this.props.unfavorite(row.id, 'album')}>Remove</Button>
+                                        </TableCell>
                                         <TableCell component="th" scope="row">
-                                            {row.album && row.album.images[0] ?
+                                            {row.image ?
                                                 <img
-                                                    src={row.album.images[0].url}
+                                                    src={row.image}
                                                     alt={row.name}
                                                     width={50}
                                                 /> : null}
-                                            <Button onClick={() => this.props.unfavorite(row.id,'album')}>
-                                                Remove
-                                                </Button>
                                         </TableCell>
                                         <TableCell>
                                             <Typography variant="subtitle1">{row.name}</Typography>
@@ -233,7 +235,7 @@ class Favorites extends Component {
                                                     alt={row.name}
                                                     width={50}
                                                 /> : null}
-                                            <Button onClick={() => this.props.unfavorite(row.id,'track')}>
+                                            <Button onClick={() => this.props.unfavorite(row.id, 'track')}>
                                                 Remove
                                                 </Button>
                                         </TableCell>
@@ -256,7 +258,7 @@ class Favorites extends Component {
     }
 }
 
-const mapStateToProps = store => ({   
+const mapStateToProps = store => ({
     favorite_artists: store.trackState.favorite_artists,
     favorite_albums: store.trackState.favorite_albums,
     favorite_tracks: store.trackState.favorite_tracks,
