@@ -1,7 +1,7 @@
 import { ModalActionType } from "../actions/actionTypes";
 import orderBy from 'lodash/orderBy';
 import groupBy from 'lodash/groupBy';
-
+import includes from 'lodash/includes';
 
 const initialState = {
     error: '',
@@ -19,10 +19,11 @@ export const artistReducer = (state = initialState, action) => {
             //ALBUMS
             if (result.albums && result.albums.items) {
                 const payload = orderBy(result.albums.items, ['release_date'], ['desc'])
-                    .map((album) => {
+                    .map((album) => {                       
                         return {
                             artist_id: album.id,
                             name: album.name,
+                            favorite: includes(result.f_albums, album.id),
                             image: album.images && album.images.length > 0 ? album.images[0].url : null,
                             hover: false,
                             external_urls: album.external_urls.spotify,
@@ -39,6 +40,7 @@ export const artistReducer = (state = initialState, action) => {
                     albumsModal = miniaba.false
                 }
             }
+            console.log(albumsModal)
             return {
                 ...state,
                 artistView: true,

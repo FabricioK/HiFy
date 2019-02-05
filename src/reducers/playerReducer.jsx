@@ -1,7 +1,7 @@
 import { ActionType } from "../actions/actionTypes";
 import orderBy from 'lodash/orderBy';
 import groupBy from 'lodash/groupBy';
-import db from '../db';
+import includes from 'lodash/includes';
 const initialState = {
     playing: false,
     searching: false,
@@ -53,12 +53,6 @@ export const playerReducer = (state = initialState, action) => {
             var artists = [];
             var albums = [];
             var tracks = [];
-
-            var f_tracks = [];
-            var t_favorites = db.tracks.toArray((i) => {
-                f_tracks.push(i);
-            });
-            console.log(f_tracks)
             //ARTISTS
             if (result.artists && result.artists.items) {
                 const payload = orderBy(result.artists.items, ['popularity', 'images'], ['desc'])
@@ -68,6 +62,7 @@ export const playerReducer = (state = initialState, action) => {
                             name: artist.name,
                             popularity: artist.popularity,
                             image: artist.images && artist.images.length > 0 ? artist.images[0].url : null,
+                            favorite: includes(result.f_artists, artist.id),
                             hover: false,
                             external_urls: artist.external_urls.spotify,
                             genres: artist.genres.join(', ')
@@ -91,6 +86,7 @@ export const playerReducer = (state = initialState, action) => {
                             album_id: album.id,
                             name: album.name,
                             image: album.images && album.images.length > 0 ? album.images[0].url : null,
+                            favorite: includes(result.f_albums, album.id),
                             hover: false,
                             external_urls: album.external_urls.spotify,
                             artists: album.artists.length > 1 ? 'Various artists' : album.artists[0].name
@@ -114,6 +110,7 @@ export const playerReducer = (state = initialState, action) => {
                             track_id: track.id,
                             name: track.name,
                             album_name: track.album.name,
+                            favorite: includes(result.f_tracks, track.id),
                             artists_name: track.artists.map(a => a.name).join(', '),
                             album_images: track.album.images ? track.album.images[0].url : null,
                             external_urls: track.external_urls.spotify,
@@ -127,6 +124,36 @@ export const playerReducer = (state = initialState, action) => {
                 artists,
                 albums,
                 tracks,
+            };
+
+        case ActionType.ADDED_FAVORITE:
+            var tracks = state.tracks.map(item => {
+                return item == action.payload ? { ...item, favorite: true } : item;
+            });
+            var artists = state.artists.map(item => {
+                return (item.childs ?
+                    {
+                        childs: item.childs.map(child => {
+                            return child.artist_id == action.payload.artist_id ? { ...child, favorite: true } : child
+                        })
+                    } :
+                    item.artist_id == action.payload.artist_id ? { ...item, favorite: true } : item)
+            });
+
+            var albums = state.albums.map(item => {
+                return (item.childs ?
+                    {
+                        childs: item.childs.map(child => {
+                            return child.album_id == action.payload.album_id ? { ...child, favorite: true } : child
+                        })
+                    } :
+                    item.album_id == action.payload.album_id ? { ...item, favorite: true } : item)
+            });
+            return {
+                ...state,
+                tracks,
+                artists,
+                albums
             };
         case ActionType.SEARCH_FAILURE:
             return {

@@ -120,7 +120,7 @@ class App extends Component {
 
     _search = () => {
         if (this.state.types.length > 0)
-            this.props.search({ token: this.props.token, query: this.state.query, type: this.state.types.join(','), limit: 20, offset: 0 });
+            this.props.search({ token: this.props.token,user_id :this.props.user.id , query: this.state.query, type: this.state.types.join(','), limit: 20, offset: 0 });
         this.props.history.push({
             pathname: '/'
         });

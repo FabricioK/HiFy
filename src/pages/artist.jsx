@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux';
 import { closeArtist, addFavorite, toogleHoverON, toogleHoverOFF } from '../actions/artistActions'
+import { openArtist } from '../actions/artistActions'
+import { openAlbum } from '../actions/albumActions'
 
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -45,8 +47,16 @@ class Artist extends Component {
         this.props.toogleHoverOFF(e, t)
     }
 
+    _openDialog = (id) => {
+        this.props.openArtist({ id, token: this.props.token ,user_id : this.props.user.id })
+    }
+
+    _openDialogAlbum = (id) => {
+        this.props.openAlbum({ id, token: this.props.token,user_id : this.props.user.id  })
+    }
+
     render() {
-        const { classes, closeArtist, artist, albums } = this.props;
+        const { classes, closeArtist, artist, albums,user,token } = this.props;
 
         return (artist == null ? <div></div> :
             <Paper className={classes.flex} >
@@ -80,11 +90,11 @@ class Artist extends Component {
                                             className={classes.nomargin}>
                                             {item.childs && item.childs
                                                 .map((child, child_index) => {
-                                                    return _GridItemAlbum(classes, child, child_index, true, this._hoverOn, this._hoverOff)
+                                                    return _GridItemAlbum(classes, child, child_index, true, this._hoverOn, this._hoverOff, this._openDialogAlbum,this.props.addFavorite,user.id)
                                                 })}
                                         </GridList>
                                     </GridListTile>)
-                            return _GridItemAlbum(classes, item, index, false, this._hoverOn, this._hoverOff)
+                            return _GridItemAlbum(classes, item, index, false, this._hoverOn, this._hoverOff, this._openDialogAlbum,this.props.addFavorite,user.id)
 
                         })
                     }
@@ -96,10 +106,11 @@ class Artist extends Component {
 const mapStateToProps = store => ({
     user: store.authState.user,
     artist: store.artistState.artistModal,
-    albums: store.artistState.albumsModal
+    albums: store.artistState.albumsModal,
+    token: store.authState.token
 });
 
 const mapDispatchToProps = dispatch =>
-    bindActionCreators({ closeArtist, addFavorite, toogleHoverON, toogleHoverOFF }, dispatch);
+    bindActionCreators({ closeArtist, addFavorite, toogleHoverON, toogleHoverOFF, addFavorite, openArtist, openAlbum  }, dispatch);
 
 export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(Artist));

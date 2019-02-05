@@ -1,9 +1,7 @@
 import { ModalActionType, AuthActionType } from "./actionTypes";
-import db from '../db';
-
+import Dexie from 'dexie';
 const API = 'https://api.spotify.com/'
-
-
+import db from '../db';
 
 const fetech_albuns = (dispatch, params, artist) => {
 
@@ -20,14 +18,23 @@ const fetech_albuns = (dispatch, params, artist) => {
                         type: AuthActionType.USER_AUTH_FAILURE,
                         payload: response.error.message
                     });
-                let albums = response;
-                dispatch({
-                    type: ModalActionType.OPEN_ARTIST,
-                    payload: {
-                        artist,
-                        albums
-                    }
+                var wait = Dexie.async(function* (dispatch) {
+                    var f_albums = [];
+                    var arr = yield db.albums.where({ user_id: params.user_id }).toArray();
+                    yield arr.forEach((i) => {
+                        f_albums.push(i.album_id);
+                    });
+
+                    dispatch({
+                        type: ModalActionType.OPEN_ARTIST,
+                        payload: {
+                            artist,
+                            albums : response,
+                            f_albums
+                        }
+                    });
                 });
+                wait(dispatch)
             });
 }
 

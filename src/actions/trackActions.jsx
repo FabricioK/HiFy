@@ -30,31 +30,94 @@ export const unfavorite = (id) => {
     }
 
 }
-export const addFavorite = (user_id, track) => {
+export const addFavorite = (user_id, track, type) => {
     return (dispatch) => {
-        db.tracks.add({
-            id: `${user_id}_${track.track_id}`,
-            user_id,
-            track_id: track.track_id,
-            name: track.name,
-            album_name: track.album_name,
-            artists_name: track.artists_name,
-            album_images: track.album_images,
-            external_urls: track.external_urls,
-            duration_ms: track.duration_ms
-        }).then(
-            (result) => {
-                dispatch({
-                    type: ActionType.ADDED_FAVORITE,
-                    payload: result
-                })
-            },
-            (error) => {
+        switch (type) {
+            case 'track':
+                db.tracks.add({
+                    id: `${user_id}_${track.track_id}`,
+                    user_id,
+                    track_id: track.track_id,
+                    name: track.name,
+                    favorite: true,
+                    album_name: track.album_name,
+                    artists_name: track.artists_name,
+                    album_images: track.album_images,
+                    external_urls: track.external_urls,
+                    duration_ms: track.duration_ms
+                }).then(
+                    (result) => {
+                        dispatch({
+                            type: ActionType.ADDED_FAVORITE,
+                            payload: track
+                        })
+                    },
+                    (error) => {
+                        dispatch({
+                            type: ActionType.ADDED_FAVORITE_FAILURE,
+                            payload: error
+                        })
+                    }
+                )
+                break;
+            case 'albums':
+                db.albums.add({
+                    id: `${user_id}_${track.album_id}`,
+                    user_id,
+                    album_id: track.album_id,
+                    name: track.name,
+                    image: track.images,
+                    favorite: true,
+                    hover: false,
+                    external_urls: track.external_urls,
+                    artists: track.artists
+                }).then(
+                    (result) => {
+                        dispatch({
+                            type: ActionType.ADDED_FAVORITE,
+                            payload: track
+                        })
+                    },
+                    (error) => {
+                        dispatch({
+                            type: ActionType.ADDED_FAVORITE_FAILURE,
+                            payload: error
+                        })
+                    }
+                )
+                break;
+            case 'artists':
+                db.artists.add({
+                    id: `${user_id}_${track.artist_id}`,
+                    user_id,
+                    artist_id: track.artist_id,
+                    name: track.name,
+                    favorite: true,
+                    album_name: track.album_name,
+                    artists_name: track.artists_name,
+                    album_images: track.album_images,
+                    external_urls: track.external_urls,
+                    duration_ms: track.duration_ms
+                }).then(
+                    (result) => {
+                        dispatch({
+                            type: ActionType.ADDED_FAVORITE,
+                            payload: track
+                        })
+                    },
+                    (error) => {
+                        dispatch({
+                            type: ActionType.ADDED_FAVORITE_FAILURE,
+                            payload: error
+                        })
+                    }
+                )
+                break;
+            default:
                 dispatch({
                     type: ActionType.ADDED_FAVORITE_FAILURE,
                     payload: error
                 })
-            }
-        )
+        }
     }
 }

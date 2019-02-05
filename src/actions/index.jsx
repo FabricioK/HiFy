@@ -1,7 +1,7 @@
 import { ActionType, AuthActionType } from "./actionTypes";
-
+import Dexie from 'dexie';
 const API = 'https://api.spotify.com/'
-
+import db from '../db';
 export const loadUser = (params) => {
     return (dispatch) => {
         dispatch({
@@ -61,10 +61,32 @@ export const search = (params) => {
                             payload: response.error.message
                         });
                     }
-                    dispatch({
-                        type: ActionType.SEARCH_SUCCESS,
-                        payload: response
+                    var wait = Dexie.async(function* (dispatch) {
+                        var f_tracks = [];
+                        var f_artists = [];
+                        var f_albums = [];
+                        var arr = yield db.tracks.where({ user_id: params.user_id }).toArray();
+                        yield arr.forEach((i) => {
+                            f_tracks.push(i.track_id);
+                        });
+                        var arr = yield db.artists.where({ user_id: params.user_id }).toArray();
+                        yield arr.forEach((i) => {
+                            f_artists.push(i.artist_id);
+                        });
+                        var arr = yield db.albums.where({ user_id: params.user_id }).toArray();
+                        yield arr.forEach((i) => {
+                            f_albums.push(i.album_id);
+                        });
+                        response.f_tracks = f_tracks;
+                        response.f_artists = f_artists;
+                        response.f_albums = f_albums;
+                        dispatch({
+                            type: ActionType.SEARCH_SUCCESS,
+                            payload: response
+                        });
                     });
+                    wait(dispatch)
+
                 }
                 ,
                 (error) => {

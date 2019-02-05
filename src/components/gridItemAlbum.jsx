@@ -5,13 +5,15 @@ import Paper from '@material-ui/core/Paper';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpotify } from '@fortawesome/free-brands-svg-icons/faSpotify';
+import { faStar } from '@fortawesome/free-regular-svg-icons/faStar';
+import { faStar as faStarSolid } from '@fortawesome/free-solid-svg-icons/faStar';
 
 import GridListTile from '@material-ui/core/GridListTile';
 import GridListTileBar from '@material-ui/core/GridListTileBar';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import Button from '@material-ui/core/Button';
 
-export const _GridItemAlbum = (classes, item, index, is_child, _hoverOn, _hoverOff, _openDialog) => {
+export const _GridItemAlbum = (classes, item, index, is_child, _hoverOn, _hoverOff, _openDialog,_addFavorite,user_id) => {
     let pop = _popularity(is_child, index, item.popularity);
     return <Grow
         in={true}
@@ -37,6 +39,9 @@ export const _GridItemAlbum = (classes, item, index, is_child, _hoverOn, _hoverO
                     <Collapse in={item.hover == true} className={classes.nomargin}>
                         <Paper className={classes.nomargin}>
                             <ListSubheader className={classes.flex} component="div">
+                                <Button onClick={() => _addFavorite(user_id, item, 'albums')}>
+                                    <FontAwesomeIcon size="2x" icon={item.favorite ? faStarSolid : faStar} color="#2196f3" />
+                                </Button>
                                 <Button target="_blank" href={item.external_urls}>
                                     <FontAwesomeIcon size="2x" icon={faSpotify} color="#1DB954" />
                                 </Button>

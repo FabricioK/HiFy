@@ -112,11 +112,11 @@ class Home extends Component {
         this.props.toogleHoverOFF(e, t)
     }
     _openDialog = (id) => {
-        this.props.openArtist({ id, token: this.props.token })
+        this.props.openArtist({ id, token: this.props.token ,user_id : this.props.user.id })
     }
 
     _openDialogAlbum = (id) => {
-        this.props.openAlbum({ id, token: this.props.token })
+        this.props.openAlbum({ id, token: this.props.token ,user_id : this.props.user.id })
     }
 
     render() {
@@ -144,11 +144,11 @@ class Home extends Component {
                                             className={classes.nomargin}>
                                             {item.childs && item.childs
                                                 .map((child, child_index) => {
-                                                    return _GridItemArtist(classes, child, child_index, true, this._hoverOn, this._hoverOff, this._openDialog)
+                                                    return _GridItemArtist(classes, child, child_index, true, this._hoverOn, this._hoverOff, this._openDialog,this.props.addFavorite,user.id)
                                                 })}
                                         </GridList>
                                     </GridListTile>)
-                            return _GridItemArtist(classes, item, index, false, this._hoverOn, this._hoverOff, this._openDialog)
+                            return _GridItemArtist(classes, item, index, false, this._hoverOn, this._hoverOff, this._openDialog,this.props.addFavorite,user.id)
                         })
                     }
                     {albums && albums.length > 0 ?
@@ -170,11 +170,11 @@ class Home extends Component {
                                             className={classes.nomargin}>
                                             {item.childs && item.childs
                                                 .map((child, child_index) => {
-                                                    return _GridItemAlbum(classes, child, child_index, true, this._hoverOn, this._hoverOff, this._openDialogAlbum)
+                                                    return _GridItemAlbum(classes, child, child_index, true, this._hoverOn, this._hoverOff, this._openDialogAlbum,this.props.addFavorite,user.id)
                                                 })}
                                         </GridList>
                                     </GridListTile>)
-                            return _GridItemAlbum(classes, item, index, false, this._hoverOn, this._hoverOff, this._openDialogAlbum)
+                            return _GridItemAlbum(classes, item, index, false, this._hoverOn, this._hoverOff, this._openDialogAlbum,this.props.addFavorite,user.id)
 
                         })
                     }
@@ -186,6 +186,7 @@ class Home extends Component {
                             <TableHead>
                                 <TableRow>
                                     <TableCell ></TableCell>
+                                    <TableCell ></TableCell>
                                     <TableCell >Track</TableCell>
                                     <TableCell >Album</TableCell>
                                     <TableCell >Duration</TableCell>
@@ -196,9 +197,11 @@ class Home extends Component {
                                 {tracks.map((row, index) => (
                                     <TableRow key={`track_${index}`}>
                                         <TableCell component="th" scope="row">
-                                            <Button onClick={() => this.props.addFavorite(user.id, row)}>
-                                                <FontAwesomeIcon size="2x" icon={faStarSolid} color="yellow" />
+                                            <Button onClick={() => this.props.addFavorite(user.id, row,'track')}>
+                                                <FontAwesomeIcon size="2x" icon={row.favorite ? faStarSolid : faStar} color="#2196f3" />
                                             </Button>
+                                        </TableCell>
+                                        <TableCell align="right">
                                             {row.album_images ?
                                                 <img
                                                     src={row.album_images}
