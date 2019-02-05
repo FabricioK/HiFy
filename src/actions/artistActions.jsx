@@ -18,7 +18,7 @@ const fetech_albuns = (dispatch, params, artist) => {
                         type: AuthActionType.USER_AUTH_FAILURE,
                         payload: response.error.message
                     });
-                var wait = Dexie.async(function* (dispatch) {
+                Dexie.async(function* (dispatch) {
                     var f_albums = [];
                     var arr = yield db.albums.where({ user_id: params.user_id }).toArray();
                     yield arr.forEach((i) => {
@@ -33,8 +33,7 @@ const fetech_albuns = (dispatch, params, artist) => {
                             f_albums
                         }
                     });
-                });
-                wait(dispatch)
+                })(dispatch);
             });
 }
 

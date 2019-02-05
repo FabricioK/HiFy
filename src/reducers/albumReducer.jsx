@@ -1,13 +1,12 @@
 import { ModalActionType } from "../actions/actionTypes";
 import orderBy from 'lodash/orderBy';
-import groupBy from 'lodash/groupBy';
-
+import includes from 'lodash/includes';
 
 const initialState = {
     error: '',
     albumView: false,
     albumModal: null,
-    tracksModal : null
+    tracksModal: null
 };
 
 const _convertMS = (millisec) => {
@@ -32,7 +31,6 @@ const _convertMS = (millisec) => {
 export const albumReducer = (state = initialState, action) => {
     switch (action.type) {
         case ModalActionType.OPEN_ALBUM:
-
             var result = action.payload;
             var tracksModal = [];
             if (result.tracks && result.tracks.items) {
@@ -41,7 +39,8 @@ export const albumReducer = (state = initialState, action) => {
                         return {
                             track_id: track.id,
                             name: track.name,
-                            album_name:result.album.name,
+                            favorite: includes(result.f_tracks, track.id),
+                            album_name: result.album.name,
                             artists_name: track.artists.map(a => a.name).join(', '),
                             album_images: result.album.images ? result.album.images[0].url : null,
                             external_urls: track.external_urls.spotify,
@@ -54,6 +53,21 @@ export const albumReducer = (state = initialState, action) => {
                 ...state,
                 albumView: true,
                 albumModal: result.album,
+                tracksModal
+            };
+        case ModalActionType.ADDED_FAVORITE_TRACK:
+            const id = action.payload;
+            var tracksModal = state.tracksModal.map(item => {
+                return (item.childs ?
+                    {
+                        childs: item.childs.map(child => {
+                            return child.track_id == id ? { ...child, favorite: true } : child
+                        })
+                    } :
+                    item.track_id == id ? { ...item, favorite: true } : item)
+            });
+            return {
+                ...state,
                 tracksModal
             };
         case ModalActionType.CLOSE_ARTIST:

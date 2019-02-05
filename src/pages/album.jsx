@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux';
-import { closeArtist, addFavorite } from '../actions/artistActions'
-
+import { closeArtist } from '../actions/artistActions'
+import { addFavorite } from '../actions/trackActions';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Button from '@material-ui/core/Button';
@@ -22,8 +22,8 @@ import withStyles from '@material-ui/core/styles/withStyles';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpotify } from '@fortawesome/free-brands-svg-icons/faSpotify';
-
-import db from '../db';
+import { faStar } from '@fortawesome/free-regular-svg-icons/faStar';
+import { faStar as faStarSolid } from '@fortawesome/free-solid-svg-icons/faStar';
 
 const styles = {
     appBar: {
@@ -31,6 +31,7 @@ const styles = {
     },
     flex: {
         flex: 1,
+        margin: 20
     },
 };
 
@@ -44,8 +45,8 @@ class Album extends Component {
     }
 
     render() {
-        const { classes, closeArtist, album, tracks } = this.props;
-        return (album ==null? <div></div> :
+        const { classes, closeArtist, album, tracks, user } = this.props;
+        return (album == null ? <div></div> :
             <Paper className={classes.flex} >
                 <AppBar className={classes.appBar}>
                     <Toolbar>
@@ -64,6 +65,7 @@ class Album extends Component {
                             <TableHead>
                                 <TableRow>
                                     <TableCell ></TableCell>
+                                    <TableCell ></TableCell>
                                     <TableCell >Track</TableCell>
                                     <TableCell >Album</TableCell>
                                     <TableCell >Duration</TableCell>
@@ -74,7 +76,11 @@ class Album extends Component {
                                 {tracks.map((row, index) => (
                                     <TableRow key={`track_${index}`}>
                                         <TableCell component="th" scope="row">
-                                            <Button onClick={() => this.props.addFavorite(user.id, row)}> Add this </Button>
+                                            <Button onClick={() => this.props.addFavorite(user.id, row, 'track')}>
+                                                <FontAwesomeIcon size="2x" icon={row.favorite ? faStarSolid : faStar} color="#2196f3" />
+                                            </Button>
+                                        </TableCell>
+                                        <TableCell>
                                             {row.album_images ?
                                                 <img
                                                     src={row.album_images}

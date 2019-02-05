@@ -13,15 +13,14 @@ const initialState = {
 export const artistReducer = (state = initialState, action) => {
     switch (action.type) {
         case ModalActionType.OPEN_ARTIST:
-
             var result = action.payload;
             var albumsModal = [];
             //ALBUMS
             if (result.albums && result.albums.items) {
                 const payload = orderBy(result.albums.items, ['release_date'], ['desc'])
-                    .map((album) => {                       
+                    .map((album) => {
                         return {
-                            artist_id: album.id,
+                            album_id: album.id,
                             name: album.name,
                             favorite: includes(result.f_albums, album.id),
                             image: album.images && album.images.length > 0 ? album.images[0].url : null,
@@ -40,7 +39,6 @@ export const artistReducer = (state = initialState, action) => {
                     albumsModal = miniaba.false
                 }
             }
-            console.log(albumsModal)
             return {
                 ...state,
                 artistView: true,
@@ -89,7 +87,22 @@ export const artistReducer = (state = initialState, action) => {
             return {
                 ...state,
                 albumsModal: t_albums
-            }        
+            }
+        case ModalActionType.ADDED_FAVORITE_ALBUM:
+            const id = action.payload;
+            var albumsModal = state.albumsModal.map(item => {
+                return (item.childs ?
+                    {
+                        childs: item.childs.map(child => {
+                            return child.album_id == id ? { ...child, favorite: true } : child
+                        })
+                    } :
+                    item.album_id == id ? { ...item, favorite: true } : item)
+            });
+            return {
+                ...state,
+                albumsModal
+            };
         default:
             return state;
     }

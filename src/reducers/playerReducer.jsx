@@ -127,27 +127,28 @@ export const playerReducer = (state = initialState, action) => {
             };
 
         case ActionType.ADDED_FAVORITE:
+            const id = action.payload;
             var tracks = state.tracks.map(item => {
-                return item == action.payload ? { ...item, favorite: true } : item;
+                return item.track_id == id ? { ...item, favorite: true } : item;
             });
             var artists = state.artists.map(item => {
                 return (item.childs ?
                     {
                         childs: item.childs.map(child => {
-                            return child.artist_id == action.payload.artist_id ? { ...child, favorite: true } : child
+                            return child.artist_id == id ? { ...child, favorite: true } : child
                         })
                     } :
-                    item.artist_id == action.payload.artist_id ? { ...item, favorite: true } : item)
+                    item.artist_id == id ? { ...item, favorite: true } : item)
             });
 
             var albums = state.albums.map(item => {
                 return (item.childs ?
                     {
                         childs: item.childs.map(child => {
-                            return child.album_id == action.payload.album_id ? { ...child, favorite: true } : child
+                            return child.album_id == id ? { ...child, favorite: true } : child
                         })
                     } :
-                    item.album_id == action.payload.album_id ? { ...item, favorite: true } : item)
+                    item.album_id == id ? { ...item, favorite: true } : item)
             });
             return {
                 ...state,

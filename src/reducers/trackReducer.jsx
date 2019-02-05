@@ -5,7 +5,9 @@ import without from 'lodash/without';
 
 const initialState = {
     error: '',
-    favorite_tracks: []
+    favorite_artists: [],
+    favorite_albums: [],
+    favorite_tracks: [],
 };
 
 export const trackReducer = (state = initialState, action) => {
@@ -15,15 +17,13 @@ export const trackReducer = (state = initialState, action) => {
                 ...state
             };
         case ActionType.LIST_FAVORITES:
+            const { artists, albums, tracks } = action.payload;
             return {
                 ...state,
-                favorite_tracks: action.payload
+                favorite_tracks: tracks,
+                favorite_artists: artists,
+                favorite_albums: albums
             };
-        case ActionType.LIST_FAVORITES:
-            return {
-                ...state,
-                favorite_tracks: []
-            };        
         default:
             return state;
     }

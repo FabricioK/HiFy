@@ -1,28 +1,36 @@
-import { ActionType, AuthActionType } from "./actionTypes";
+import { ActionType, ModalActionType } from "./actionTypes";
 import db from '../db';
-
+import Dexie from 'dexie';
 
 export const listFavorites = (user_id) => {
     return (dispatch) => {
-        db.tracks.where('user_id').equals(user_id).toArray().then(
-            (result) => {
-                dispatch({
-                    type: ActionType.LIST_FAVORITES,
-                    payload: result
-                })
-            },
-            (error) => {
-                dispatch({
-                    type: ActionType.LIST_FAVORITES_FAILURE,
-                    payload: error
-                })
-            }
-        )
+        Dexie.async(function* (dispatch) {
+            const artists = yield db.artists.where('user_id').equals(user_id).toArray();
+            const albums = yield db.albums.where('user_id').equals(user_id).toArray();
+            const tracks = yield db.tracks.where('user_id').equals(user_id).toArray();
+            dispatch({
+                type: ActionType.LIST_FAVORITES,
+                payload: { artists, albums, tracks }
+            });
+        })(dispatch)
     }
 }
-export const unfavorite = (id) => {
+
+export const unfavorite = (id, type) => {
     return (dispatch) => {
-        db.tracks.delete(id);
+        switch (type) {
+            case 'artist':
+                db.artists.delete(id);
+                break;
+            case 'album':
+                db.albums.delete(id);
+                break;
+            case 'track':
+                db.tracks.delete(id);
+                break;
+            default:
+                break;
+        }
         dispatch({
             type: ActionType.UNFAVORITE_TRACK,
             payload: id
@@ -30,6 +38,7 @@ export const unfavorite = (id) => {
     }
 
 }
+
 export const addFavorite = (user_id, track, type) => {
     return (dispatch) => {
         switch (type) {
@@ -49,7 +58,11 @@ export const addFavorite = (user_id, track, type) => {
                     (result) => {
                         dispatch({
                             type: ActionType.ADDED_FAVORITE,
-                            payload: track
+                            payload: track.track_id
+                        })
+                        dispatch({
+                            type: ModalActionType.ADDED_FAVORITE_TRACK,
+                            payload: track.track_id
                         })
                     },
                     (error) => {
@@ -75,7 +88,11 @@ export const addFavorite = (user_id, track, type) => {
                     (result) => {
                         dispatch({
                             type: ActionType.ADDED_FAVORITE,
-                            payload: track
+                            payload: track.album_id
+                        })
+                        dispatch({
+                            type: ModalActionType.ADDED_FAVORITE_ALBUM,
+                            payload: track.album_id
                         })
                     },
                     (error) => {
@@ -102,7 +119,11 @@ export const addFavorite = (user_id, track, type) => {
                     (result) => {
                         dispatch({
                             type: ActionType.ADDED_FAVORITE,
-                            payload: track
+                            payload: track.artist_id
+                        })
+                        dispatch({
+                            type: ModalActionType.ADDED_FAVORITE,
+                            payload: track.artist_id
                         })
                     },
                     (error) => {
