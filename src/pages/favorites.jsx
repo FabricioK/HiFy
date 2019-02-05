@@ -240,12 +240,17 @@ class Favorites extends Component {
                                                 </Button>
                                         </TableCell>
                                         <TableCell>
-                                            <Typography variant="subtitle1">{row.name}</Typography>
+                                            <Typography variant="subtitle1">
+                                                {row.name}
+                                            </Typography>
+                                            {row.artists_name}
                                         </TableCell>
-                                        <TableCell>{row.album}</TableCell>
-                                        <TableCell align="right"></TableCell>
+                                        <TableCell>{row.album_name}</TableCell>
+                                        <TableCell align="right">{row.duration_ms}</TableCell>
                                         <TableCell align="right">
-
+                                            <Button target="_blank" href={row.external_urls}>
+                                                <FontAwesomeIcon size="2x" icon={faSpotify} color="#1DB954" />
+                                            </Button>
                                         </TableCell>
                                     </TableRow>
                                 ))}
